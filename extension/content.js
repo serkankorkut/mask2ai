@@ -21,6 +21,9 @@
   };
   document.addEventListener('DOMContentLoaded', () => show('on, personal data is masked before sending', 4000));
 
+  const gunzip = bytes => new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  const gzip = async text => new Uint8Array(await new Response(new Blob([text]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+
   const origFetch = window.fetch;
   window.fetch = async function (input, init) {
     try {
@@ -30,6 +33,11 @@
         if (init && typeof init.body === 'string') {
           const body = rewrite(init.body, mask, found);
           if (Object.keys(found).length) init = Object.assign({}, init, { body });
+        } else if (init && (init.body instanceof ArrayBuffer || ArrayBuffer.isView(init.body))) {
+          const bytes = init.body instanceof ArrayBuffer ? new Uint8Array(init.body) : new Uint8Array(init.body.buffer, init.body.byteOffset, init.body.byteLength);
+          const gz = bytes[0] === 0x1f && bytes[1] === 0x8b;
+          const body = rewrite(gz ? await gunzip(bytes) : new TextDecoder().decode(bytes), mask, found);
+          if (Object.keys(found).length) init = Object.assign({}, init, { body: gz ? await gzip(body) : new TextEncoder().encode(body) });
         } else if (init && init.body instanceof URLSearchParams) {
           const body = rewrite(init.body.toString(), mask, found);
           if (Object.keys(found).length) init = Object.assign({}, init, { body: new URLSearchParams(body) });
