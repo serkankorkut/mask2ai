@@ -42,10 +42,11 @@ const PATTERNS = [
   ['CARD', /\b[2-6]\d{14,15}\b|\b[2-6]\d{3}(?:[ -]\d{4}){3}\b|\b[2-6]\d{3}[ -]\d{6}[ -]\d{5}\b/g, luhn],
   ['TCKN', /\b[1-9]\d{10}\b/g, tckn],
   ['SSN', /\b\d{3}-\d{2}-\d{4}\b/g],
-  ['PHONE', /(?:\+|\b00)\d{1,3}[ .-]?\(?\d{1,4}\)?(?:[ .-]?\d{2,4}){2,4}\b|\b0\d{3}[ .-]?\d{3}[ .-]?\d{2}[ .-]?\d{2}\b|\(\d{3}\)[ .-]?\d{3}[ .-]?\d{4}\b/g],
+  ['PHONE', /(?:\+|\b00)\d{1,3}[ .-]?\(?\d{1,4}\)?(?:[ .-]?\d{2,4}){2,4}\b|\b0\d{3}[ .-]?\d{3}[ .-]?\d{2}[ .-]?\d{2}\b|\(\d{3}\)[ .-]?\d{3}[ .-]?\d{4}\b|\b\d{3}[.-]\d{3}[.-]\d{4}\b|\b0\d{4} ?\d{6}\b/g],
   ['ADDRESS', /(?<![\p{L}_])(?:address|addr|street[ _-]?address|billing[ _-]?address|shipping[ _-]?address|home[ _-]?address|adres|ev[ _-]?adresi)\s*["']?\s*[:=]\s*["']?([^\n"']{8,120}?)\s*(?=[\n"']|$)/giu, addressLike],
   ['ADDRESS', /\b\d{1,5}[A-Za-z]?\s+(?:[A-Z][a-z]+\.?\s+){1,3}(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Way|Place|Pl|Highway|Hwy|Parkway|Pkwy)\b\.?(?:,?\s*(?:Apt|Suite|Ste|Unit|Floor|Fl|#)\.?\s*[\w-]+)?(?:,\s*[A-Z][a-z]+(?:\s[A-Z][a-z]+)*)?(?:,?\s*[A-Z]{2}\s+\d{5}(?:-\d{4})?|\s+[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2})?|\bP\.?O\.?\s*Box\s+\d+\b|\bPosta Kutusu\s*\d+\b/g],
   ['ADDRESS', /(?<!\p{L})\p{Lu}[\p{L}.]+(?:\s+\p{Lu}[\p{L}.]+)*\s+(?:Mah\.?|Mahallesi|Mh\.|Cad\.?|Caddesi|Cd\.|Sok\.?|Sokak|Sk\.|Bulvarı|Blv\.)[^\n]{0,80}?No:?\s*\d+[A-Za-z]?(?:[ /,-]*(?:Daire|Kat|D|K)\.?:?\s*\d+)*(?:[ ,]*\p{Lu}\p{L}+\s*\/\s*\p{Lu}\p{L}+)?/gu],
+  ['NAME', /(?<!\p{L})(?:[Mm]y name is|I am|I'm|[Dd]ear|[Rr]egards|[Ss]incerely|[Bb]est regards|[Kk]ind regards|[Cc]heers|[Bb]enim adım|[Bb]en|[Mm]erhaba|[Ss]aygılar(?:ımla)?|[Ss]evgiler)\s*,?\s+(\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+){1,2})/gu],
   ['NAME', /(?<!\p{L})(?:Mr|Mrs|Ms|Miss|Dr|Prof|Sayın|Sn|Bay|Bayan)\.?\s+(\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+){0,2})/gu],
   ['NAME', /(?<![\p{L}_])(?:full[ _-]?name|first[ _-]?name|last[ _-]?name|given[ _-]?name|family[ _-]?name|surname|customer(?:[ _-]?name)?|contact(?:[ _-]?name)?|owner|patient|employee|name|ad[ _-]?soyad|adı[ _-]?soyadı|isim|müşteri|hasta)\s*["']?\s*[:=]\s*["']?([^\n,;"']{2,60}?)\s*(?=[\n,;"']|$)/giu, personLike]
 ];

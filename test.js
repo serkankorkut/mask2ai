@@ -42,6 +42,14 @@ assert.strictEqual(unmask(m3, f3), csv);
 assert.strictEqual(mask("Can you help Deniz? mail: deniz.can@x.com is fine", {}).split("__PII_").length, 4);
 assert.strictEqual(mask("Can you help Deniz? No email here.", {}), "Can you help Deniz? No email here.");
 
+const en = "Hi, I am John Smith, call 555-123-4567 or 555.123.4567 or 07700 900123. I live at 42 Oak Avenue, Apt 3B, Boston, MA 02116. Dear Mr. Brown, my name is Alice Cooper. Regards, Bob Marley. Sent 2026-09-18 from build 1.2.3 with 123.456 items";
+const f4 = {};
+const m4 = mask(en, f4);
+for (const s of ["John Smith", "555-123-4567", "555.123.4567", "07700 900123", "42 Oak Avenue, Apt 3B, Boston, MA 02116", "Brown", "Alice Cooper", "Bob Marley"]) assert(!m4.includes(s), s + " leaked: " + m4);
+assert(m4.endsWith("Sent 2026-09-18 from build 1.2.3 with 123.456 items"), m4);
+assert.strictEqual(unmask(m4, f4), en);
+assert.strictEqual(mask("This is Claude Code. Dear team, I am done. Best regards", {}), "This is Claude Code. Dear team, I am done. Best regards");
+
 const data = fs.mkdtempSync(path.join(os.tmpdir(), 'pii-mask-'));
 const run = input => {
   const r = spawnSync(process.execPath, [path.join(__dirname, 'hooks/mask.js')], {
