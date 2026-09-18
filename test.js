@@ -72,6 +72,8 @@ const post = run({ hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_respo
 const ph = post.hookSpecificOutput.updatedToolOutput.stdout.trim().split(' ')[1];
 assert(/^__PII_EMAIL_[0-9a-f]{6}__$/.test(ph), ph);
 assert.deepStrictEqual(Object.keys(post.hookSpecificOutput.updatedToolOutput), ['stdout', 'stderr', 'interrupted', 'isImage']);
+assert.strictEqual(post.systemMessage, 'pii-mask: masked 1 value in Bash output');
+assert(run({ hook_event_name: 'SessionStart', source: 'startup' }).systemMessage.startsWith('pii-mask active'));
 assert.strictEqual(run({ hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_response: { stdout: 'clean\n', stderr: '' } }), null);
 
 assert.strictEqual(run({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command: 'ls' } }), null);

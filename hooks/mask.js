@@ -114,7 +114,7 @@ const main = () => {
   const out = o => process.stdout.write(JSON.stringify(o));
   switch (input.hook_event_name) {
     case 'SessionStart':
-      process.stdout.write('Tokens shaped like __PII_EMAIL_a1b2c3__ are personal data masked by the pii-mask plugin. Treat them as opaque literals: copy them verbatim into tool inputs, never guess, expand or alter them.');
+      out({ systemMessage: 'pii-mask active: personal data in prompts and tool output is masked before it reaches the model', hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: 'Tokens shaped like __PII_EMAIL_a1b2c3__ are personal data masked by the pii-mask plugin. Treat them as opaque literals: copy them verbatim into tool inputs, never guess, expand or alter them.' } });
       break;
     case 'UserPromptSubmit': {
       const found = {};
@@ -134,7 +134,8 @@ const main = () => {
       const updated = deepMap(input.tool_response, s => mask(s, found));
       if (!Object.keys(found).length) break;
       save(id, found);
-      out({ hookSpecificOutput: { hookEventName: 'PostToolUse', updatedToolOutput: updated } });
+      const n = Object.keys(found).length;
+      out({ systemMessage: `pii-mask: masked ${n} value${n === 1 ? '' : 's'} in ${input.tool_name} output`, hookSpecificOutput: { hookEventName: 'PostToolUse', updatedToolOutput: updated } });
       break;
     }
     case 'PreToolUse': {
