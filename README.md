@@ -1,10 +1,33 @@
 # pii-mask
 
-Claude Code plugin that keeps personal data on your machine. It masks emails, phone numbers, card numbers, IBANs, Turkish national IDs and US SSNs before they reach the model, and restores them where they are needed.
+Keeps personal data on your machine when you talk to an AI. It masks names, emails, phone numbers, card numbers, IBANs, national IDs and addresses before they leave, and shows you the real values back.
 
-![pii-mask demo](demo/demo.gif)
+| Where | How | Status |
+| --- | --- | --- |
+| Claude Code (terminal and desktop app) | plugin, six hooks | supported |
+| claude.ai in Chrome | extension, rewrites the request in the page | supported |
+| ChatGPT web in Chrome | extension, same code | supported |
+| ChatGPT desktop app | native app, no extension or hook surface | not possible without a system-wide TLS proxy, see Limits |
 
-The demo feeds real hook payloads through the plugin. Re-record it with `asciinema rec --window-size 124x13 -c "bash demo/run.sh" demo/demo.cast && agg --theme dracula --font-size 14 --last-frame-duration 4 demo/demo.cast demo/demo.gif`.
+One detection core, `core/pii.js`, serves both the plugin and the extension.
+
+## Demos
+
+### Claude Code
+
+![pii-mask in Claude Code](demo/claude-code.gif)
+
+Real hook payloads through the real plugin, narrated. Re-record with `asciinema rec --window-size 124x13 -c "bash demo/run.sh" demo/claude-code.cast && agg --theme dracula --font-size 14 --last-frame-duration 4 demo/claude-code.cast demo/claude-code.gif`.
+
+### ChatGPT web
+
+![pii-mask on chatgpt.com](demo/chatgpt-web.gif)
+
+A real anonymous chat on chatgpt.com in Chrome with the extension loaded. The purple captions are added by the recorder; the text under "what ChatGPT actually received" is the `prompt` field captured from the outgoing request. Re-record with `node demo/chrome-open.js https://chatgpt.com/` and then `node demo/record-live.js chatgpt.com "<your message>" demo/chatgpt-web.gif`.
+
+### claude.ai
+
+Same extension, same code path, verified by `node demo/verify-web.js`, which loads the extension into headless Chrome on claude.ai and chatgpt.com, sends a chat request from the page and checks the captured body. A recorded claude.ai session needs a logged-in account, so record your own with `node demo/chrome-open.js https://claude.ai/`, log in, then `node demo/record-live.js claude.ai "<your message>" demo/claude-ai.gif`.
 
 ## How it works
 
@@ -57,6 +80,14 @@ Requires Node.js 18+ on `PATH`. To try it from a checkout:
 claude --plugin-dir /path/to/pii-mask
 ```
 
+### claude.ai and ChatGPT in Chrome
+
+1. Clone or download this repository.
+2. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and pick the repository folder. The `manifest.json` at the root is the extension.
+3. Open claude.ai or chatgpt.com. A purple "pii-mask: on" toast confirms it is active.
+
+From then on, every message you send is masked before it leaves the browser and a toast says how many values were masked. Claude or ChatGPT replies with placeholders; the page shows you the real values. The placeholder map lives in the tab's `sessionStorage` and disappears when the tab closes.
+
 ## Test
 
 ```
@@ -79,7 +110,8 @@ Same binary, same plugin, same hooks; only the model is fake. The captured reque
 ## Limits
 
 - Name and address detection is heuristic. A bare name in free text with no label, title or matching email nearby passes through, and labels like `name:` can catch non-person values. An NER model is the upgrade path.
-- Images and pasted files are not inspected.
+- Images and pasted files are not inspected. In the browser, text extracted from uploaded files on claude.ai is masked; ChatGPT file uploads are not.
+- ChatGPT desktop is a native app with no hook or extension API. The only way to filter its traffic is a system-wide TLS-intercepting proxy with your own root certificate, which this project does not do. Use ChatGPT in Chrome instead.
 - Prompts cannot be rewritten by hooks, so a prompt with personal data has to be resent in masked form.
 - Bash hooks see tool output, not the raw API request. If you need a hard guarantee, run a masking proxy and point `ANTHROPIC_BASE_URL` at it.
 

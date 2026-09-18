@@ -3,7 +3,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { mask, unmask, luhn, tckn, iban } = require('./hooks/mask.js');
+const { mask, unmask, luhn, tckn, iban } = require('./core/pii.js');
+const { isChatRequest, rewrite } = require('./extension/rewrite.js');
 
 assert(luhn('4111 1111 1111 1111'));
 assert(!luhn('1234 5678 9012 3456'));
@@ -49,6 +50,28 @@ for (const s of ["John Smith", "555-123-4567", "555.123.4567", "07700 900123", "
 assert(m4.endsWith("Sent 2026-09-18 from build 1.2.3 with 123.456 items"), m4);
 assert.strictEqual(unmask(m4, f4), en);
 assert.strictEqual(mask("This is Claude Code. Dear team, I am done. Best regards", {}), "This is Claude Code. Dear team, I am done. Best regards");
+
+assert(isChatRequest("https://claude.ai/api/organizations/o1/chat_conversations/c1/completion"));
+assert(isChatRequest("https://chatgpt.com/backend-api/f/conversation"));
+assert(isChatRequest("https://chatgpt.com/backend-anon/f/conversation?x=1"));
+assert(isChatRequest("https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0&operationId=1"));
+assert(isChatRequest("https://chatgpt.com/backend-api/conversation/prepare"));
+assert(!isChatRequest("https://chatgpt.com/backend-api/me"));
+assert(!isChatRequest("https://chatgpt.com/unauth-mweb/sentinel/ping"));
+const ff = {};
+const form = new URLSearchParams(rewrite("conversationState=" + encodeURIComponent(JSON.stringify({ backendConversationId: "6aad6fb5", messages: [{ content: "old mail ali@example.com" }] })) + "&prompt=" + encodeURIComponent("Say ok. Ref probe.person@example.org") + "&chatRequirementsToken=gAAAAABqrW_omd7nK", mask, ff));
+assert(/^Say ok\. Ref __PII_EMAIL_[0-9a-f]{6}__$/.test(form.get("prompt")), form.get("prompt"));
+assert(JSON.parse(form.get("conversationState")).messages[0].content.startsWith("old mail __PII_EMAIL_"));
+assert.strictEqual(form.get("chatRequirementsToken"), "gAAAAABqrW_omd7nK");
+assert.deepStrictEqual(Object.values(ff).sort(), ["ali@example.com", "probe.person@example.org"]);
+assert(!isChatRequest("https://claude.ai/api/organizations/o1/chat_conversations/c1/completion_history"));
+const fc = {};
+const claudeBody = JSON.parse(rewrite(JSON.stringify({ prompt: "mail ali@example.com", attachments: [{ extracted_content: "card 4111 1111 1111 1111" }], parent_message_uuid: "550e8400-e29b-41d4-a716-446655440000" }), mask, fc));
+assert(!claudeBody.prompt.includes("ali@") && !claudeBody.attachments[0].extracted_content.includes("4111"));
+assert.strictEqual(claudeBody.parent_message_uuid, "550e8400-e29b-41d4-a716-446655440000");
+const fg = {};
+const gptBody = JSON.parse(rewrite(JSON.stringify({ action: "next", messages: [{ content: { content_type: "text", parts: ["call +90 532 123 45 67"] } }], model: "auto" }), mask, fg));
+assert(/^call __PII_PHONE_[0-9a-f]{6}__$/.test(gptBody.messages[0].content.parts[0]) && gptBody.model === "auto");
 
 const data = fs.mkdtempSync(path.join(os.tmpdir(), 'pii-mask-'));
 const run = input => {
