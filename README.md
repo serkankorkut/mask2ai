@@ -2,6 +2,10 @@
 
 Claude Code plugin that keeps personal data on your machine. It masks emails, phone numbers, card numbers, IBANs, Turkish national IDs and US SSNs before they reach the model, and restores them where they are needed.
 
+![pii-mask demo](demo/demo.gif)
+
+The demo feeds real hook payloads through the plugin. Re-record it with `asciinema rec --window-size 132x14 -c "bash demo/run.sh" demo/demo.cast && agg --theme dracula --font-size 14 demo/demo.cast demo/demo.gif`.
+
 ## How it works
 
 | Hook | What happens |
