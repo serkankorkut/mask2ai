@@ -17,7 +17,9 @@ One detection core, `core/pii.js`, serves both the plugin and the extension.
 
 ![pii-mask in Claude Code](demo/claude-code.gif)
 
-Real hook payloads through the real plugin, narrated. Re-record with `asciinema rec --window-size 124x13 -c "bash demo/run.sh" demo/claude-code.cast && agg --theme dracula --font-size 14 --last-frame-duration 4 demo/claude-code.cast demo/claude-code.gif`.
+The real Claude Code terminal with the plugin loaded. You see the prompt blocked with a masked copy, the masked resend, the Read tool output masked before it reaches the model, and the model's placeholder-filled answer restored on screen. The model replies come from `demo/fake-api.js`, a local stand-in for the Anthropic API, so the recording needs no account and no real request leaves the machine. Everything else, the CLI, the hooks and the masking, is real.
+
+Re-record: `node demo/fake-api.js 8790 &` then `asciinema rec --window-size 120x34 -c "expect demo/claude-code.exp" demo/claude-code.cast && agg --theme dracula --font-size 13 --last-frame-duration 4 demo/claude-code.cast demo/claude-code.gif`. To record against the real model instead, log in with `claude` and delete the three `ANTHROPIC_*` lines from `demo/claude-code.exp`.
 
 ### ChatGPT web
 
