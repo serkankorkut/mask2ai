@@ -4,7 +4,7 @@ Claude Code plugin that keeps personal data on your machine. It masks emails, ph
 
 ![pii-mask demo](demo/demo.gif)
 
-The demo feeds real hook payloads through the plugin. Re-record it with `asciinema rec --window-size 132x14 -c "bash demo/run.sh" demo/demo.cast && agg --theme dracula --font-size 14 demo/demo.cast demo/demo.gif`.
+The demo feeds real hook payloads through the plugin. Re-record it with `asciinema rec --window-size 124x13 -c "bash demo/run.sh" demo/demo.cast && agg --theme dracula --font-size 14 --last-frame-duration 4 demo/demo.cast demo/demo.gif`.
 
 ## How it works
 
