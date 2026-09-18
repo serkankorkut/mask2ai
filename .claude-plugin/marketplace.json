@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "pii-mask",
+  "description": "Personal data masking for Claude Code.",
+  "owner": {
+    "name": "Serkan Korkut",
+    "url": "https://github.com/serkankorkut"
+  },
+  "plugins": [
+    {
+      "name": "pii-mask",
+      "description": "Masks personal data before it leaves Claude Code, restores it in tool calls and on screen.",
+      "source": "./",
+      "category": "security"
+    }
+  ]
+}

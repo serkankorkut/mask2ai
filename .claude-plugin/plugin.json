@@ -1,0 +1,10 @@
+{
+  "name": "pii-mask",
+  "description": "Masks personal data (emails, phones, cards, IBANs, national IDs) before it leaves Claude Code, and restores it in tool calls and on screen.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Serkan Korkut"
+  },
+  "license": "MIT",
+  "keywords": ["privacy", "pii", "redaction", "security"]
+}
