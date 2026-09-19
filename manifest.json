@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "pii-mask",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Masks personal data before it is sent to claude.ai or ChatGPT and shows you the real values back.",
+  "minimum_chrome_version": "111",
   "content_scripts": [
     {
       "matches": ["https://claude.ai/*", "https://chatgpt.com/*", "https://chat.openai.com/*"],

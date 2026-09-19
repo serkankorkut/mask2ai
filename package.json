@@ -1,0 +1,17 @@
+{
+  "name": "pii-mask",
+  "version": "0.3.0",
+  "description": "Masks personal data before it reaches an AI assistant. Claude Code plugin and Chrome extension for claude.ai and ChatGPT.",
+  "private": true,
+  "license": "MIT",
+  "author": "Serkan Korkut",
+  "repository": "github:serkankorkut/pii-mask",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node test.js",
+    "prove": "node demo/prove.js",
+    "verify:web": "node demo/verify-web.js"
+  }
+}
