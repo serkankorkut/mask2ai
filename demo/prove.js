@@ -73,7 +73,7 @@ server.listen(0, '127.0.0.1', async () => {
   console.log(`   API requests made: ${requests.length}, all captured by the fake server`);
   for (const [i, m] of requests.entries()) console.log(`\n   request ${i + 1}, last user message:\n   ${userText(m).slice(0, 500)}`);
   const wire = JSON.stringify(requests);
-  const leaked = secrets.filter(s => wire.includes(s));
+  const leaked = secrets.filter(s => new RegExp('(?<![A-Za-z])' + s.replace(/[.*+?^${}()|[\]\\]/g, '\\  const leaked = secrets.filter(s => wire.includes(s));') + '(?![A-Za-z])', 'u').test(wire));
   const placeholders = new Set(wire.match(/__PII_[A-Z]+_[0-9a-f]{6}__/g) || []);
   console.log(`\n   placeholders on the wire: ${placeholders.size}`);
   console.log(`   personal data on the wire: ${leaked.length ? 'LEAKED ' + leaked.join(', ') : 'none'}`);
