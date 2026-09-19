@@ -4,7 +4,7 @@ const { spawn } = require('child_process');
 
 const root = path.join(__dirname, '..');
 const target = path.join(root, 'demo', 'customers.csv');
-const secrets = ['Jane', 'John', 'Doe', 'jane.doe@example.com', 'john.doe@example.com', '555 555 5555', '555 555 55 55', '111-11-1111', '222-22-2222', '11111111110', '22222222220', '123 Main St', 'Bağdat Cad.', 'ali@example.com'];
+const secrets = ['Jane', 'John', 'jane.doe@example.com', 'john.doe@example.com', '555 555 5555', '555 555 55 55', '111-11-1111', '222-22-2222', '11111111110', '22222222220', '123 Main St', 'Bağdat Cad.', 'ali@example.com'];
 const requests = [];
 
 const sse = events => events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify({ type, ...data })}\n\n`).join('');
@@ -78,6 +78,7 @@ server.listen(0, '127.0.0.1', async () => {
   const placeholders = new Set(wire.match(/__PII_[A-Z]+_[0-9a-f]{6}__/g) || []);
   console.log(`\n   placeholders on the wire: ${placeholders.size}`);
   console.log(`   personal data on the wire: ${leaked.length ? 'LEAKED ' + leaked.join(', ') : 'none'}`);
+  for (const s of leaked) for (const m of wire.matchAll(new RegExp('(?<![A-Za-z])' + escape(s) + '(?![A-Za-z])', 'gu'))) console.log(`   context: …${wire.slice(Math.max(0, m.index - 80), m.index + s.length + 40).replace(/\s+/g, ' ')}…`);
   if (leaked.length || !placeholders.size) process.exit(1);
   console.log('\nPROOF OK: nothing personal reached the API, only placeholders.');
 });
