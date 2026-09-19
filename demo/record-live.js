@@ -25,30 +25,30 @@ const frames = fs.mkdtempSync(path.join(os.tmpdir(), 'pii-mask-frames-'));
   const record = (async () => {
     while (recording) {
       await b.screenshot(path.join(frames, `f${String(n++).padStart(4, '0')}.png`)).catch(() => 0);
-      await sleep(400);
+      await sleep(120);
     }
   })();
-  await sleep(1500);
+  await sleep(800);
   await caption('1 / 3   You type a message that contains an email address and a phone number.');
-  await sleep(1500);
+  await sleep(1200);
   await b.evaluate(`(document.querySelector('#prompt-textarea') || document.querySelector('[contenteditable="true"]') || document.querySelector('textarea')).focus()`);
   for (const ch of prompt) {
     await b.send('Input.insertText', { text: ch });
-    await sleep(30);
+    await sleep(25);
   }
-  await sleep(1500);
+  await sleep(700);
   for (const type of ['keyDown', 'keyUp']) await b.send('Input.dispatchKeyEvent', { type, key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
-  await sleep(2500);
+  await sleep(1500);
   await caption('2 / 3   pii-mask replaced them before the message left your browser. This is what ChatGPT actually received:\n\n' + (sentPrompt() || '(request not captured)'));
-  await sleep((+process.env.REPLY_WAIT || 22000) - 8000);
+  await sleep(+process.env.REPLY_WAIT || 9000);
   await caption('3 / 3   ChatGPT answered without ever seeing the real email or number. On your screen everything looks normal.');
-  await sleep(5500);
+  await sleep(3500);
   await b.evaluate(`document.getElementById('pii-demo-caption')?.remove()`);
   recording = false;
   await record;
   await b.send('Emulation.clearDeviceMetricsOverride');
   b.close();
-  const r = spawnSync('ffmpeg', ['-loglevel', 'error', '-y', '-framerate', '2.5', '-i', path.join(frames, 'f%04d.png'), '-vf', 'scale=1000:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=3', out]);
+  const r = spawnSync('ffmpeg', ['-loglevel', 'error', '-y', '-framerate', '8', '-i', path.join(frames, 'f%04d.png'), '-vf', 'scale=1000:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=3', out]);
   if (r.status !== 0) throw new Error(r.stderr.toString());
   fs.rmSync(frames, { recursive: true, force: true });
   console.log(`${out}: ${n} frames, ${(fs.statSync(out).size / 1024).toFixed(0)} KB`);

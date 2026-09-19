@@ -43,6 +43,14 @@ assert.strictEqual(unmask(m3, f3), csv);
 assert.strictEqual(mask("Can you help Deniz? mail: deniz.can@x.com is fine", {}).split("__PII_").length, 4);
 assert.strictEqual(mask("Can you help Deniz? No email here.", {}), "Can you help Deniz? No email here.");
 
+const extra = "DOB: 12/03/1988, doğum tarihi: 12.03.1988, passport no: U12345678, kimlik no 12345678901, plaka 34 ABC 123, from 85.105.23.11, local 192.168.1.10 and 10.0.0.1 and 127.0.0.1, version 1.2.3.4 is not an ip";
+const fx = {};
+const mx = mask(extra, fx);
+for (const s of ["12/03/1988", "12.03.1988", "U12345678", "12345678901", "34 ABC 123", "85.105.23.11"]) assert(!mx.includes(s), s + " leaked: " + mx);
+for (const s of ["192.168.1.10", "10.0.0.1", "127.0.0.1"]) assert(mx.includes(s), s + " wrongly masked: " + mx);
+assert(mx.includes("version 1.2.3.4"), mx);
+assert.strictEqual(unmask(mx, fx), extra);
+
 const en = "Hi, I am John Smith, call 555-123-4567 or 555.123.4567 or 07700 900123. I live at 42 Oak Avenue, Apt 3B, Boston, MA 02116. Dear Mr. Brown, my name is Alice Cooper. Regards, Bob Marley. Sent 2026-09-18 from build 1.2.3 with 123.456 items";
 const f4 = {};
 const m4 = mask(en, f4);

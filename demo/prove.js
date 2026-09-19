@@ -4,7 +4,7 @@ const { spawn } = require('child_process');
 
 const root = path.join(__dirname, '..');
 const target = path.join(root, 'demo', 'customers.csv');
-const secrets = ['Ayşe', 'Yılmaz', 'ayse.yilmaz@example.com', '+90 532 111 22 33', 'Bağdat Cad.', 'John', 'Smith', 'john.smith@example.com', '(555) 123-4567', '123 Main St', 'ali@example.com'];
+const secrets = ['Jane', 'John', 'Doe', 'jane.doe@example.com', 'john.doe@example.com', '555 555 5555', '555 555 55 55', '111-11-1111', '222-22-2222', '11111111110', '22222222220', '123 Main St', 'Bağdat Cad.', 'ali@example.com'];
 const requests = [];
 
 const sse = events => events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify({ type, ...data })}\n\n`).join('');

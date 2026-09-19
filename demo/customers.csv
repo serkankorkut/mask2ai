@@ -1,3 +1,3 @@
-id,first_name,last_name,email,phone,address
-1,Ayşe,Yılmaz,ayse.yilmaz@example.com,+90 532 111 22 33,"Bağdat Cad. No:5 D:2 Kadıköy/İstanbul"
-2,John,Smith,john.smith@example.com,(555) 123-4567,"123 Main St, Springfield, IL 62704"
+id,first_name,last_name,email,phone,ssn,tc_kimlik_no,address
+1,Jane,Doe,jane.doe@example.com,+1 555 555 5555,111-11-1111,11111111110,"123 Main St, Springfield, IL 62704"
+2,John,Doe,john.doe@example.com,+90 555 555 55 55,222-22-2222,22222222220,"Bağdat Cad. No:5 D:2 Kadıköy/İstanbul"

@@ -63,7 +63,7 @@ Everything left of the API box runs on your machine. The API only ever sees plac
 | `MessageDisplay` | Placeholders in Claude's replies are restored on screen. The transcript keeps the placeholders. |
 | `SessionEnd` | The placeholder map for the session is deleted. |
 
-Names and addresses are found heuristically, in English and Turkish: labels (`name:`, `"firstName":`, `address:`, `adres:`), titles (`Dr.`, `Mr.`, `Sayın`), conversational cues (`I am John Smith`, `my name is`, `Regards,`, `Benim adım`), US and UK street shapes (`123 Main St, Springfield, IL 62704`, `221B Baker Street, London NW1 6XE`), Turkish shapes (`Atatürk Mah. Cumhuriyet Cad. No:12 D:3 Kadıköy/İstanbul`), and names derived from masked emails (`ali.yilmaz@` also masks `Ali Yılmaz`). Phone formats cover international `+..`, US `555-123-4567` and `(555) 123-4567`, UK `07700 900123` and Turkish `0532 123 45 67`.
+Names and addresses are found heuristically, in English and Turkish: labels (`name:`, `"firstName":`, `address:`, `adres:`), titles (`Dr.`, `Mr.`, `Sayın`), conversational cues (`I am John Smith`, `my name is`, `Regards,`, `Benim adım`), US and UK street shapes (`123 Main St, Springfield, IL 62704`, `221B Baker Street, London NW1 6XE`), Turkish shapes (`Atatürk Mah. Cumhuriyet Cad. No:12 D:3 Kadıköy/İstanbul`), and names derived from masked emails (`jane.doe@` also masks `Jane Doe`, and `ali.yilmaz@` masks `Ali Yılmaz`). Phone formats cover international `+..`, US `555-123-4567` and `(555) 123-4567`, UK `07700 900123` and Turkish `0532 123 45 67`.
 
 Placeholders look like `__PII_EMAIL_3f9a1c__`. The suffix is a hash of the value, so the same value always maps to the same placeholder and the map self-heals after a resume: re-reading a file recreates it.
 
@@ -107,11 +107,11 @@ Do not take the README's word for it. `demo/prove.js` starts a fake Anthropic AP
 node demo/prove.js
 ```
 
-Same binary, same plugin, same hooks; only the model is fake. The captured request bodies are exactly what would have gone to Anthropic. If you prefer your own instrument, point `ANTHROPIC_BASE_URL` at mitmproxy or any logging proxy and read the traffic yourself.
+Same binary, same plugin, same hooks; only the model is fake. The sample file holds names, emails, phones, US SSNs, Turkish TC numbers and addresses. The captured request bodies are exactly what would have gone to Anthropic. If you prefer your own instrument, point `ANTHROPIC_BASE_URL` at mitmproxy or any logging proxy and read the traffic yourself.
 
 ## Limits
 
-- Name and address detection is heuristic. A bare name in free text with no label, title or matching email nearby passes through, and labels like `name:` can catch non-person values. An NER model is the upgrade path.
+- Detection is pattern based. Structured identifiers (emails, phones, cards, IBANs, TC numbers, SSNs, dates of birth and passport numbers after a label, Turkish plates, public IPs) are reliable in English and Turkish. Name and address detection is heuristic. A bare name in free text with no label, title or matching email nearby passes through, and labels like `name:` can catch non-person values. An NER model is the upgrade path.
 - Images and pasted files are not inspected. In the browser, text extracted from uploaded files on claude.ai is masked; ChatGPT file uploads are not.
 - ChatGPT desktop is a native app with no hook or extension API. The only way to filter its traffic is a system-wide TLS-intercepting proxy with your own root certificate, which this project does not do. Use ChatGPT in Chrome instead.
 - Prompts cannot be rewritten by hooks, so a prompt with personal data has to be resent in masked form.
@@ -130,7 +130,7 @@ Same binary, same plugin, same hooks; only the model is fake. The captured reque
 - `SessionStart` prints one line of context telling the model that `__PII_*__` tokens are opaque literals to copy verbatim.
 - `SessionEnd` deletes the session's placeholder map.
 
-**Detection is an ordered list of patterns.** Each entry is a type, a regex and an optional validator. Emails go first so their digits are not later mistaken for phones; cards, IBANs and Turkish IDs run before phones for the same reason. Validators cut false positives: Luhn for cards, mod 97 for IBANs, the two-digit checksum for TCKN. Label, title and cue patterns capture only the value, and a shape check (`personLike`, `addressLike`) rejects things like `name: pii-mask` or `address: 0x7fff`. After the static pass, the local part of every masked email is split into tokens and each token is masked wherever it appears capitalized or in all caps, accent-insensitively, so `ayse.yilmaz@` also hides `Ayşe` and `YILMAZ` in a CSV column.
+**Detection is an ordered list of patterns.** Each entry is a type, a regex and an optional validator. Emails go first so their digits are not later mistaken for phones; cards, IBANs and Turkish IDs run before phones for the same reason. Validators cut false positives: Luhn for cards, mod 97 for IBANs, the two-digit checksum for TCKN. Label, title and cue patterns capture only the value, and a shape check (`personLike`, `addressLike`) rejects things like `name: pii-mask` or `address: 0x7fff`. After the static pass, the local part of every masked email is split into tokens and each token is masked wherever it appears capitalized or in all caps, accent-insensitively, so `jane.doe@` also hides `Jane` and `DOE` in a CSV column.
 
 **Placeholders are content-addressed.** A value becomes `__PII_<TYPE>_<first 6 hex of sha1(value)>__`. Because the token is derived from the value, the same email produces the same placeholder in a prompt, a file read and a grep result without any lookup, two hooks running in parallel cannot disagree, and after a resume a single re-read rebuilds the map. Underscores keep the token a single word for the model and syntactically harmless inside code.
 

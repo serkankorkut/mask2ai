@@ -6,35 +6,32 @@ set env(ANTHROPIC_BASE_URL) "http://127.0.0.1:8790"
 set env(ANTHROPIC_AUTH_TOKEN) "demo-only-token"
 set env(CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC) "1"
 set env(COLORTERM) "truecolor"
+proc pause {ms} {
+  after $ms set ::wake 1
+  vwait ::wake
+}
 proc type {text} {
   foreach ch [split $text ""] {
     send -- $ch
-    sleep 0.06
+    pause 45
   }
 }
 cd $root
 spawn claude --plugin-dir $root
 expect {
-  -re {use this API key} { sleep 1; send "1"; sleep 0.5; send "\033\[13;1u"; exp_continue }
-  -re {(?i)trust the files} { sleep 1; send "\033\[13;1u"; exp_continue }
+  -re {use this API key} { pause 1000; send "1"; pause 500; send "\033\[13;1u"; exp_continue }
+  -re {(?i)trust the files} { pause 1000; send "\033\[13;1u"; exp_continue }
   -re {pii-mask active} {}
   timeout {}
 }
-sleep 3
-type "Email ayse.yilmaz@example.com and tell her invoice 1042 is overdue. Her details are in demo/customers.csv"
-sleep 1.5
+expect_background -re {.+} {}
+pause 2500
+type "Email jane.doe@example.com and tell her invoice 1042 is overdue and confirm her SSN and TC number from demo/customers.csv"
+pause 1200
 send "\033\[13;1u"
-expect {
-  -re {personal data found} {}
-  timeout {}
-}
-sleep 5
-type "Email __PII_EMAIL_c82211__ and tell her invoice 1042 is overdue. Her details are in demo/customers.csv"
-sleep 1.5
+pause 5000
+type "Email __PII_EMAIL_ae44b4__ and tell her invoice 1042 is overdue and confirm her SSN and TC number from demo/customers.csv"
+pause 1200
 send "\033\[13;1u"
-expect {
-  -re {Thank you\.} {}
-  timeout {}
-}
-sleep 8
+pause 12000
 exit
