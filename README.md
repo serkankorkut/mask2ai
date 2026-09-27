@@ -189,7 +189,7 @@ node demo/chrome-open.js https://chatgpt.com/
 node demo/record-live.js chatgpt.com "<your message>" demo/chatgpt-web.gif
 ```
 
-The marketing site for mask2ai.com is in `site/`, static files under `site/public` served as Cloudflare Workers assets. Preview locally with `python3 -m http.server 8123 --directory site/public`, or `cd site && npm install && npm run dev`; deploy with `npm run deploy` from `site/`.
+The marketing site for mask2ai.com lives in its own repository, github.com/serkankorkut/mask2ai.com.
 
 ## License
 
