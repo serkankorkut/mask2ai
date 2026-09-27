@@ -1,7 +1,7 @@
 {
   "name": "mask2ai",
   "description": "Masks personal data (emails, phones, cards, IBANs, national IDs) before it leaves Claude Code, and restores it in tool calls and on screen.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": {
     "name": "Serkan Korkut"
   },

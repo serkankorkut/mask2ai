@@ -9,7 +9,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const launch = async (url, { headless = true } = {}) => {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'mask2ai-chrome-'));
-  const args = ['--remote-debugging-pipe', '--enable-unsafe-extension-debugging', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--window-size=1280,800', '--lang=en-US', '--disable-blink-features=AutomationControlled'];
+  const args = ['--remote-debugging-pipe', '--enable-unsafe-extension-debugging', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--window-size=1280,800', '--lang=en-US', '--disable-blink-features=AutomationControlled', '--disable-features=BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessSendPreflights,PrivateNetworkAccessRespectPreflightResults,LocalNetworkAccessChecks'];
   if (headless) args.push('--headless=new');
   const proc = spawn(CHROME, [...args, 'about:blank'], { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'] });
   const [, , , input, output] = proc.stdio;

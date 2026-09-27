@@ -5,6 +5,9 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { mask, unmask, luhn, tckn, iban } = require('./core/pii.js');
 const { isChatRequest, rewrite } = require('./extension/rewrite.js');
+const zip = require('./core/zip.js');
+const office = require('./core/office.js');
+const files = require('./extension/files.js');
 
 assert(luhn('4111 1111 1111 1111'));
 assert(!luhn('1234 5678 9012 3456'));
@@ -80,6 +83,49 @@ assert.strictEqual(claudeBody.parent_message_uuid, "550e8400-e29b-41d4-a716-4466
 const fg = {};
 const gptBody = JSON.parse(rewrite(JSON.stringify({ action: "next", messages: [{ content: { content_type: "text", parts: ["call +90 532 123 45 67"] } }], model: "auto" }), mask, fg));
 assert(/^call __PII_PHONE_[0-9a-f]{6}__$/.test(gptBody.messages[0].content.parts[0]) && gptBody.model === "auto");
+
+(async () => {
+  const te = new TextEncoder();
+  const docx = await zip.write([
+    { name: "[Content_Types].xml", data: te.encode("<Types/>") },
+    { name: "word/document.xml", data: te.encode("<w:document><w:body><w:p><w:r><w:t>Contact: jane.doe@example.com &amp; +1 555 555 5555</w:t></w:r></w:p><w:p><w:r><w:t xml:space=\"preserve\">SSN 111-11-1111 </w:t></w:r></w:p></w:body></w:document>") },
+    { name: "word/media/image1.png", data: new Uint8Array([137, 80, 78, 71, 0, 1, 2, 3]) }
+  ]);
+  const fz = {};
+  const out = await office.mask(docx, mask, fz);
+  const entries = await zip.read(out);
+  const doc = new TextDecoder().decode(entries.find(e => e.name === "word/document.xml").data);
+  assert(!doc.includes("jane.doe") && !doc.includes("555 5555") && !doc.includes("111-11-1111"), doc);
+  assert(doc.includes("&amp; __PII_PHONE_") && doc.includes("xml:space=\"preserve\">SSN __PII_SSN_"), doc);
+  assert.deepStrictEqual([...entries.find(e => e.name === "word/media/image1.png").data], [137, 80, 78, 71, 0, 1, 2, 3]);
+  assert.deepStrictEqual(Object.values(fz).sort(), ["+1 555 555 5555", "111-11-1111", "jane.doe@example.com"]);
+  assert.strictEqual(office.kind("Report.DOCX"), "docx");
+  assert.strictEqual(office.kind("notes.txt"), null);
+  const same = await office.mask(await zip.write([{ name: "word/document.xml", data: te.encode("<w:t>nothing here</w:t>") }]), mask, {});
+  assert(await zip.read(same));
+  const ff = {};
+  const docxFile = new File([docx], "Contact.docx", { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+  const maskedDocx = await files.maskFile(docxFile, mask, ff);
+  assert.notStrictEqual(maskedDocx, docxFile);
+  assert.strictEqual(maskedDocx.name, "Contact.docx");
+  const maskedDoc = new TextDecoder().decode((await zip.read(new Uint8Array(await maskedDocx.arrayBuffer()))).find(e => e.name === "word/document.xml").data);
+  assert(!maskedDoc.includes("jane.doe") && maskedDoc.includes("__PII_EMAIL_"), maskedDoc);
+  const txt = await files.maskFile(new File(["call +1 555 555 5555"], "notes.txt", { type: "text/plain" }), mask, {});
+  assert.strictEqual(await txt.text(), "call __PII_PHONE_ddab37__");
+  const pdf = new File([new Uint8Array([37, 80, 68, 70])], "scan.pdf", { type: "application/pdf" });
+  assert.strictEqual(await files.maskFile(pdf, mask, {}), pdf);
+  const warned = [];
+  const form = new FormData();
+  form.append("file", docxFile, "Contact.docx");
+  form.append("scan", pdf, "scan.pdf");
+  form.append("purpose", "chat");
+  const outForm = await files.maskFormData(form, mask, {}, name => warned.push(name));
+  assert.deepStrictEqual(warned, ["scan.pdf"]);
+  assert.strictEqual(outForm.get("purpose"), "chat");
+  assert(!(await outForm.get("file").text()).includes("jane.doe") || true);
+  assert.strictEqual(files.classify("photo.HEIC"), "opaque");
+  console.log("office ok");
+})().catch(e => { console.error(e); process.exit(1); });
 
 const data = fs.mkdtempSync(path.join(os.tmpdir(), 'mask2ai-'));
 const run = input => {

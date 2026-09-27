@@ -1,6 +1,7 @@
 (() => {
   const { mask, unmask, hasPlaceholder } = window.pii;
   const { isChatRequest, rewrite } = window.piiRewrite;
+  const { maskFile, maskFormData } = window.mask2aiFiles;
   const KEY = 'mask2ai-map';
   const map = (() => {
     try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch { return {}; }
@@ -28,7 +29,25 @@
   window.fetch = async function (input, init) {
     try {
       const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
-      if (isChatRequest(url)) {
+      const warn = name => show(`${name} was uploaded uninspected, PDFs and images are not masked in the browser`, 6000);
+      if (init && init.body instanceof FormData) {
+        const found = {};
+        init = Object.assign({}, init, { body: await maskFormData(init.body, mask, found, warn) });
+        const n = Object.keys(found).length;
+        if (n) {
+          save(found);
+          show(`masked ${n} value${n === 1 ? '' : 's'} in an uploaded file`, 5000);
+        }
+      } else if (init && init.body instanceof File) {
+        const found = {};
+        const masked = await maskFile(init.body, mask, found);
+        if (masked !== init.body) init = Object.assign({}, init, { body: masked });
+        const n = Object.keys(found).length;
+        if (n) {
+          save(found);
+          show(`masked ${n} value${n === 1 ? '' : 's'} in ${init.body.name}`, 5000);
+        } else if (window.mask2aiFiles.classify(init.body.name) === 'opaque') warn(init.body.name);
+      } else if (isChatRequest(url)) {
         const found = {};
         if (init && typeof init.body === 'string') {
           const body = rewrite(init.body, mask, found);

@@ -8,9 +8,9 @@ Two integrations share one detection core:
 
 | Environment | Integration | Verified by |
 | --- | --- | --- |
-| Claude Code CLI | plugin, six hooks | `node test.js`, `node demo/prove.js` |
-| claude.ai in Chrome | extension | `node demo/verify-web.js` |
-| ChatGPT web (chatgpt.com) in Chrome | extension | `node demo/verify-web.js` |
+| Claude Code CLI | plugin, six hooks, PDF to text, image redaction on macOS | `node test.js`, `node demo/prove.js` |
+| claude.ai in Chrome | extension, chat text and Office or text uploads | `node demo/verify-web.js` |
+| ChatGPT web (chatgpt.com) in Chrome | extension, chat text | `node demo/verify-web.js` |
 
 ## Demos
 
@@ -44,6 +44,17 @@ A real chat on chatgpt.com in Chrome with the extension loaded. The purple capti
 | Street address | after a label (`address:`, `adres:`), US and UK street shapes, Turkish `Mah.` / `Cad.` / `Sok.` shapes with `No:` | shape check |
 
 Detection is pattern based and works in English and Turkish. Structured identifiers are matched reliably. Names and addresses are matched when there is a signal around them: a label, a title, a cue or a matching email. A bare name in free text with none of these passes through, and semantic facts such as health, religion or income are not detected. See Limits.
+
+## Files
+
+| File | Claude Code | claude.ai and ChatGPT in Chrome |
+| --- | --- | --- |
+| Text: .txt, .md, .csv, .json, .xml, .html, .yaml, .log, source code | masked in tool output | masked when uploaded |
+| Office: .docx, .xlsx, .pptx | Claude reads these through scripts, whose text output is masked | masked in place when uploaded: the XML text inside the zip is rewritten, formatting and images untouched |
+| PDF | the Read is redirected to a masked text extraction (PDFKit); the raw PDF is never read by the model. A PDF with no extractable text is withheld | uploaded uninspected, a toast says so |
+| Image: .png, .jpg, .gif, .webp | the Read is redirected to a copy where the words that match, found by Apple Vision OCR, are blacked out in the pixels | uploaded uninspected, a toast says so |
+
+PDF and image handling in Claude Code needs macOS with the Swift toolchain (`xcode-select --install`); the helper in `hooks/vision.swift` is compiled once into the plugin data directory on first use. On other systems PDFs and images pass through with a warning.
 
 ## How it works
 
@@ -139,7 +150,8 @@ If you prefer your own instrument, point `ANTHROPIC_BASE_URL` at a logging proxy
 
 - Detection is pattern based, not a language model. A name in free text with no label, title, cue or matching email nearby is not detected. Labels such as `name:` can also catch values that are not personal.
 - Semantic personal data, for example health conditions, religion, ethnicity or income stated in prose, is not detected.
-- Images and binary attachments are not inspected. In the browser, text extracted from files uploaded to claude.ai is masked; ChatGPT file uploads are not.
+- In the browser, PDF and image uploads are not inspected; a toast says so. Office and text uploads are masked. Upload masking is verified on claude.ai; ChatGPT web uploads use a two-step flow that has not been verified.
+- Image redaction relies on OCR. Text the OCR cannot read, handwriting, or personal data that is not text, such as a face, is not redacted.
 - Claude Code hooks cannot rewrite a prompt, only block it, so a prompt containing personal data has to be resent in masked form.
 - The Chrome extension rewrites requests made through the page's `fetch`. It has been verified against the current claude.ai and chatgpt.com request formats, JSON and form-encoded, plain and gzip-compressed. A change in either site's client may require an update.
 
@@ -151,7 +163,7 @@ If you prefer your own instrument, point `ANTHROPIC_BASE_URL` at a logging proxy
 
 - `UserPromptSubmit` receives `prompt`. On a hit it returns `decision: "block"` with the masked text in `reason` and, on macOS, copies it with `pbcopy`.
 - `PostToolUse` receives `tool_response` in whatever shape the tool uses. Every string in it is masked and the same structure is returned as `hookSpecificOutput.updatedToolOutput`.
-- `PreToolUse` receives `tool_input`. Placeholders are swapped back to real values and returned as `hookSpecificOutput.updatedInput`.
+- `PreToolUse` receives `tool_input`. Placeholders are swapped back to real values and returned as `hookSpecificOutput.updatedInput`. For a `Read` of a PDF or an image the file is converted first, to a masked text file or a redacted image under the plugin data directory, and the Read is redirected to that file. Rewriting the output afterwards is not enough: Claude Code attaches the original PDF as a document block next to the tool result, which the proof caught.
 - `MessageDisplay` receives each streamed `delta` of the assistant's text and returns it with placeholders restored in `displayContent`. Only the screen changes.
 - `SessionStart` returns a status line for the user and one line of context telling the model that `__PII_*__` tokens are opaque literals to copy verbatim.
 - `SessionEnd` deletes the session's placeholder map.
