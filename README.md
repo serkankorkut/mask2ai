@@ -1,3 +1,5 @@
+<p align="center"><img src="brand/logo.svg" width="280" alt="mask2ai"></p>
+
 # mask2ai
 
 Keeps personal data on your machine when you work with an AI assistant. mask2ai detects names, contact details, identity numbers, payment details and addresses in what you send, replaces them with placeholders before anything leaves your device, and shows you the real values back.
@@ -190,6 +192,10 @@ node demo/record-live.js chatgpt.com "<your message>" demo/chatgpt-web.gif
 ```
 
 The marketing site for mask2ai.com lives in its own repository, github.com/serkankorkut/mask2ai.com.
+
+## Continuing the work
+
+`HANDOFF.md` carries the context another person or agent needs to pick this up: repositories, verification commands, recording tricks, conventions and open work.
 
 ## License
 
