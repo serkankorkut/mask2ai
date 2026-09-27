@@ -1,0 +1,16 @@
+# Working on mask2ai
+
+Read `HANDOFF.md` first; it has the architecture, the verification commands and the open work.
+
+## Words the owner uses
+
+- `DEPLOY ET`: deploy the marketing site (`npm run deploy` in `~/repo/mask2ai.com`). Never deploy without it.
+- `SYNC ET`: everything at once. Commit and push this repo and the site repo, bump the version if the code changed since the last tag, tag and publish the GitHub release with the extension zip attached (`scripts/pack-extension.sh`), rebuild and deploy the marketing site, then run `npm run indexnow` in the site repo.
+
+## Rules
+
+- Verify before claiming: `npm test`, `node demo/prove.js`, `node demo/verify-web.js`. Do not list an environment or a file type the checks do not cover.
+- No code comments unless unavoidable. No trailing whitespace. No newline at end of file.
+- Commit messages: `type: Capitalised summary`, no attribution lines.
+- Demo data is Jane Doe and John Doe with repetitive numbers.
+- Keep `manifest.json`, `.claude-plugin/plugin.json` and `package.json` at the same version; the site reads it.

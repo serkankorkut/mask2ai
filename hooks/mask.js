@@ -130,6 +130,7 @@ const main = () => {
         const found = {};
         const result = /\.pdf$/i.test(file) ? redirectPdf(id, input, found) : redirectImage(id, input, found);
         save(id, found);
+        if (result && result.hookSpecificOutput && input.cwd && path.resolve(file).startsWith(path.resolve(input.cwd) + path.sep)) result.hookSpecificOutput.permissionDecision = 'allow';
         if (result) out(result);
         break;
       }

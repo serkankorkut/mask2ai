@@ -37,6 +37,14 @@ http.createServer((req, res) => {
     if (process.env.FAKE_API_LOG) fs.appendFileSync(process.env.FAKE_API_LOG, `${tool ? 'tool_result' : 'user'} ${(tool || text).replace(/\s+/g, ' ').slice(0, 160)}\n`);
     res.writeHead(200, { 'content-type': 'text/event-stream' });
     if (/write the title/i.test(text)) return res.end(reply([{ type: 'text', text: 'Overdue invoice reminder' }], 'end_turn'));
+    if (/customer\.pdf/i.test(text) || /customer\.png/i.test(text)) {
+      const done = msg.messages.filter(m => m.role === 'user' && Array.isArray(m.content) && m.content.some(b => b.type === 'tool_result')).length;
+      if (done === 0) return res.end(reply([{ type: 'text', text: 'Reading the PDF first.' }, { type: 'tool_use', id: 'toolu_' + Date.now(), name: 'Read', input: { file_path: path.join(__dirname, 'customer.pdf') } }], 'tool_use'));
+      if (done === 1) return res.end(reply([{ type: 'text', text: 'Now the image.' }, { type: 'tool_use', id: 'toolu_' + Date.now(), name: 'Read', input: { file_path: path.join(__dirname, 'customer.png') } }], 'tool_use'));
+      const pdfText = msg.messages.flatMap(m => Array.isArray(m.content) ? m.content : []).filter(b => b.type === 'tool_result').map(b => typeof b.content === 'string' ? b.content : '').join('\n');
+      const pick = type => (pdfText.match(new RegExp(`__PII_${type}_[0-9a-f]{6}__`)) || ['unknown'])[0];
+      return res.end(reply([{ type: 'text', text: `Both files are the same customer record.\n\nThe PDF reached me as text with placeholders: name ${pick('NAME')}, email ${pick('EMAIL')}, phone ${pick('PHONE')}, SSN ${pick('SSN')}.\n\nThe image reached me with those four values blacked out; I can read the labels Name, Email, Phone and SSN but not what follows them.\n\nSo I can confirm the record exists and what fields it has, without having seen the personal data itself.` }], 'end_turn'));
+    }
     if (tool) {
       const text = tool;
       const pick = type => (text.match(new RegExp(`__PII_${type}_[0-9a-f]{6}__`)) || ['unknown'])[0];

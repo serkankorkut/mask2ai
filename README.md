@@ -1,4 +1,4 @@
-<p align="center"><img src="brand/logo.svg" width="280" alt="mask2ai"></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/logo-dark.svg"><img src="brand/logo.svg" width="280" alt="mask2ai"></picture></p>
 
 # mask2ai
 

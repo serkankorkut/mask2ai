@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+set timeout 90
+set root [file dirname [file normalize [info script]]]/..
+foreach k [array names env CLAUDE*] { unset env($k) }
+set env(ANTHROPIC_BASE_URL) "http://127.0.0.1:8790"
+set env(ANTHROPIC_AUTH_TOKEN) "demo-only-token"
+set env(CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC) "1"
+set env(COLORTERM) "truecolor"
+proc pause {ms} {
+  after $ms set ::wake 1
+  vwait ::wake
+}
+proc type {text} {
+  foreach ch [split $text ""] {
+    send -- $ch
+    pause 45
+  }
+}
+cd $root
+spawn claude --plugin-dir $root
+expect {
+  -re {use this API key} { pause 1000; send "1"; pause 500; send "\033\[13;1u"; exp_continue }
+  -re {(?i)trust the files} { pause 1000; send "\033\[13;1u"; exp_continue }
+  -re {mask2ai active} {}
+  timeout {}
+}
+expect_background -re {.+} {}
+pause 2500
+type "Read demo/customer.pdf and demo/customer.png and tell me what they contain"
+pause 1200
+send "\033\[13;1u"
+expect {
+  -re {without having seen} {}
+  timeout {}
+}
+pause 9000
+exit
