@@ -1,5 +1,5 @@
 {"version":3,"term":{"cols":120,"rows":36},"timestamp":1790541550,"command":"expect demo/claude-code.exp","env":{"SHELL":"/bin/zsh"}}
-[0.034, "o", "spawn claude --plugin-dir /Users/serkankorkut/repo/mask2ai/demo/..\r\r\r\n"]
+[0.034, "o", "spawn claude --plugin-dir /Users/demo/repo/mask2ai/demo/..\r\r\r\n"]
 [0.691, "o", "\u001b7\u001b[r\u001b8\u001b[?25h"]
 [0.065, "o", "\u001b[?25l\u001b[?2004h\u001b[?1004h\u001b[?2031h"]
 [0.001, "o", "\u001b]0;✳ Claude Code\u0007"]

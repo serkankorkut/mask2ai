@@ -15,8 +15,8 @@ Placeholders are `__PII_<TYPE>_<6 hex of cyrb53(value)>__`, content-addressed so
 
 | Repo | Path | Purpose |
 | --- | --- | --- |
-| github.com/serkankorkut/mask2ai (private) | `~/repo/mask2ai` | plugin, extension, core, tests, demos, this file |
-| github.com/serkankorkut/mask2ai.com (private) | `~/repo/mask2ai.com` | marketing site, Cloudflare Workers assets, `public/` |
+| github.com/serkankorkut/mask2ai (public) | `~/repo/mask2ai` | plugin, extension, core, tests, demos, this file |
+| github.com/serkankorkut/mask2ai.com (public) | `~/repo/mask2ai.com` | marketing site, Cloudflare Workers assets, `public/` |
 
 Current version 0.4.0 in `manifest.json`, `.claude-plugin/plugin.json`, `package.json`. Keep the three in sync.
 
@@ -58,10 +58,10 @@ Logo from the owner's Claude Design export: document → mask → robot mark, pl
 ## Open work, in priority order
 
 1. **Codex CLI support.** Not implemented. Facts gathered on 2026-09-28: Codex CLI 0.154 has hooks marked stable (`codex features list`), configured in `~/.codex/hooks.json`, `<repo>/.codex/hooks.json` or a `[hooks]` table in `config.toml`, with the same event names and stdin fields as Claude Code (`prompt`, `tool_name`, `tool_input`, `tool_response`). Documented outputs: `decision: "block"` for `UserPromptSubmit` and `PostToolUse`, `hookSpecificOutput.updatedInput` for `PreToolUse`, `additionalContext`, `systemMessage`. Tool output rewriting is not documented, so masking file reads through hooks may be impossible; test `updatedToolOutput` empirically first. A probe with logging hooks under `codex exec` hung without firing (likely waiting on the app-server or a trust prompt) and was killed. If hooks cannot rewrite tool output, the alternative is a local proxy set via `openai_base_url` or `chatgpt_base_url` in `config.toml` that rewrites Responses API `input` items and restores placeholders in streamed deltas. Do not ship or advertise Codex until `PostToolUse` masking is verified.
-2. **claude.ai recorded demo.** The extension is verified on claude.ai by `verify-web.js`, but a recorded demo needs a logged-in account. The owner's Chrome had the unpacked extension loaded from the old `~/repo/pii-mask` path; it must be re-added from `~/repo/mask2ai`. Then `node demo/record-live.js claude.ai "<message>" demo/claude-ai.gif` against a Chrome started by `chrome-open.js`, or drive the owner's own Chrome. Late injection of the scripts into an already-loaded page does not work: claude.ai captures `fetch` at load.
-3. **Publishing.** Both repos are private, so the GitHub links on the site 404 for visitors. The extension is not on the Chrome Web Store. The Claude Code plugin installs from the repo as its own marketplace and could be submitted to the official Anthropic marketplace once public.
+2. **claude.ai recorded demo.** The extension is verified on claude.ai by `verify-web.js`, but a recorded demo needs a logged-in account. Then `node demo/record-live.js claude.ai "<message>" demo/claude-ai.gif` against a Chrome started by `chrome-open.js`, or drive the owner's own Chrome. Late injection of the scripts into an already-loaded page does not work: claude.ai captures `fetch` at load.
+3. **Publishing.** The extension is not on the Chrome Web Store. The Claude Code plugin installs from the repo as its own marketplace and could be submitted to the official Anthropic marketplace once public.
 4. **Detection limits** are stated in the README: pattern based, no bare names in prose, no semantic data, no images. The upgrade path is an NER model.
 
 ## Machine-specific notes (owner's Mac)
 
-The `claude` CLI's OAuth token is expired, so `prove.js` and the TUI demo use fake APIs by design. Chrome 153 is installed. `asciinema`, `agg`, `ffmpeg`, `expect` are available. The ChatGPT app bundles Codex at `/Applications/ChatGPT.app/Contents/Resources/codex`; `codex` is not on `PATH`.
+`prove.js` and the TUI demo use fake APIs by design. Chrome 153 is installed. `asciinema`, `agg`, `ffmpeg`, `expect` are available. The ChatGPT app bundles Codex at `/Applications/ChatGPT.app/Contents/Resources/codex`; `codex` is not on `PATH`.
