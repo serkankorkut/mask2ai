@@ -1,0 +1,45 @@
+:root {
+  --bg: #fbfaf7;
+  --fg: #1c1b18;
+  --muted: #6b675f;
+  --line: #e2ded4;
+  --code: #f1efe8;
+  --accent: #6b21a8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171b;
+    --fg: #e8e6e1;
+    --muted: #9a978f;
+    --line: #2b2e34;
+    --code: #1d2025;
+    --accent: #c084fc;
+  }
+}
+* { box-sizing: border-box; }
+html { font: 16px/1.6 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg); color: var(--fg); }
+body { margin: 0; }
+.wrap { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
+main { padding-top: 4rem; padding-bottom: 3rem; }
+.hero { text-align: center; margin-bottom: 3.5rem; }
+.mark { display: inline-block; margin: 0 0 1rem; color: var(--accent); font-size: 0.9rem; line-height: 1.2; text-align: left; }
+h1 { font-size: 2.6rem; margin: 0; letter-spacing: -0.02em; }
+.tagline { font-size: 1.1rem; color: var(--muted); margin: 0.5rem 0 0; }
+h2 { font-size: 1rem; text-transform: lowercase; letter-spacing: 0.08em; color: var(--muted); margin: 2.5rem 0 0.75rem; }
+h2::before { content: "# "; }
+p { margin: 0 0 1rem; }
+ul { padding-left: 1.2rem; margin: 0 0 1rem; }
+li { margin: 0 0 0.4rem; }
+a { color: var(--fg); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+a:hover { color: var(--accent); }
+code { background: var(--code); padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.92em; }
+.label { color: var(--muted); font-size: 0.9rem; margin: 1rem 0 0.35rem; }
+.cmd { position: relative; margin: 0 0 1rem; padding: 0.9rem 1rem; background: var(--code); border: 1px solid var(--line); border-radius: 6px; overflow-x: auto; font-size: 0.92rem; line-height: 1.55; }
+.cmd code { background: none; padding: 0; font-size: inherit; }
+.cmd button { position: absolute; top: 0.5rem; right: 0.5rem; font: inherit; font-size: 0.8rem; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 0.1rem 0.5rem; cursor: pointer; }
+.cmd button:hover { color: var(--accent); border-color: var(--accent); }
+img { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; display: block; margin: 0 0 1rem; }
+footer { border-top: 1px solid var(--line); padding-top: 1.25rem; padding-bottom: 3rem; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; }
+footer ul { list-style: none; padding: 0; margin: 0; display: flex; gap: 1.25rem; }
+footer li { margin: 0; }
+@media (max-width: 40rem) { h1 { font-size: 2rem; } main { padding-top: 2.5rem; } }

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>mask2ai</title>
+<meta name="description" content="Keeps personal data on your machine when you talk to an AI. Masks names, contact details, identity and payment numbers before they leave, shows you the real values back.">
+<meta name="author" content="Serkan Korkut">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15171b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://mask2ai.com/">
+<meta property="og:url" content="https://mask2ai.com/">
+<meta property="og:title" content="mask2ai">
+<meta property="og:description" content="Keeps personal data on your machine when you talk to an AI.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="mask2ai">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <pre class="mark" aria-hidden="true">
+ ┌─────────┐
+ │ ████ ██ │
+ │ ██ ████ │
+ └────┬────┘
+      │</pre>
+    <h1>mask2ai</h1>
+    <p class="tagline">Personal data stays on your machine when you talk to an AI.</p>
+  </header>
+
+  <section class="install">
+    <h2>Install</h2>
+    <p class="label">Claude Code</p>
+    <pre class="cmd"><code>/plugin marketplace add serkankorkut/mask2ai
+/plugin install mask2ai@mask2ai</code><button type="button" data-copy aria-label="Copy">copy</button></pre>
+    <p class="label">claude.ai and ChatGPT in Chrome</p>
+    <p>Clone the repository, open <code>chrome://extensions</code>, turn on Developer mode, choose Load unpacked and pick the folder. <a href="https://github.com/serkankorkut/mask2ai#install">Full steps</a>.</p>
+  </section>
+
+  <section>
+    <h2>What it does</h2>
+    <p>Before a message, a file or a command result leaves your machine, mask2ai replaces every email, phone number, card number, IBAN, national ID, social security number, date of birth, name and street address it finds with a placeholder such as <code>__PII_EMAIL_ae44b4__</code>. The model only ever works with placeholders. On your screen, in your files and in the commands that run, the real values are put back.</p>
+    <p>Nothing is sent anywhere else. There is no server, no account and no dependency beyond Node.js.</p>
+  </section>
+
+  <section>
+    <h2>Where it works</h2>
+    <ul>
+      <li><strong>Claude Code CLI</strong>, as a plugin with six hooks: prompts, tool output, tool input and the on-screen reply.</li>
+      <li><strong>claude.ai in Chrome</strong>, as an extension that rewrites the outgoing request in the page.</li>
+      <li><strong>ChatGPT web in Chrome</strong>, same extension, same code.</li>
+    </ul>
+    <p>Detection covers English and Turkish formats, with checksums for cards, IBANs and TC numbers.</p>
+  </section>
+
+  <section>
+    <h2>See it</h2>
+    <img src="/claude-code.gif" alt="mask2ai in the Claude Code terminal: a prompt with an email is blocked, the masked prompt goes through, a CSV is read with 13 values masked, and the reply shows the real values restored on screen" width="1146" height="810" loading="lazy">
+    <p>The real Claude Code terminal with the plugin loaded. The prompt with an email is blocked and a masked copy is offered. The masked prompt goes through, the file read is masked before the model sees it, and the reply comes back with placeholders that are restored on screen.</p>
+  </section>
+
+  <section>
+    <h2>Verify it</h2>
+    <p>Do not take the page's word for it. The repository ships three checks.</p>
+    <pre class="cmd"><code>npm test                  # detection, restoration, request rewriting
+node demo/prove.js        # every byte Claude Code sends, captured and inspected
+node demo/verify-web.js   # the extension on claude.ai and chatgpt.com, headless</code></pre>
+    <p>The second starts a fake Anthropic API on localhost, points the real <code>claude</code> binary at it and asserts that a prompt with an email produces zero requests and that a file read arrives as placeholders only.</p>
+  </section>
+
+  <section>
+    <h2>Limits</h2>
+    <p>Detection is pattern based. Structured identifiers are matched reliably. Names and addresses are matched when a label, a title, a cue or a matching email is nearby; a bare name in free text is not. Health, religion or income stated in prose is not detected. Images are not inspected.</p>
+  </section>
+</main>
+<footer class="wrap">
+  <ul>
+    <li><a href="https://github.com/serkankorkut/mask2ai">github</a></li>
+    <li><a href="https://github.com/serkankorkut/mask2ai#readme">docs</a></li>
+    <li><a href="https://serkan.fyi">serkan.fyi</a></li>
+  </ul>
+  <span>MIT · © 2026 Serkan Korkut</span>
+</footer>
+<script>
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+  await navigator.clipboard.writeText(b.previousElementSibling.textContent);
+  b.textContent = 'copied';
+  setTimeout(() => b.textContent = 'copy', 1500);
+}));
+</script>
+</body>
+</html>

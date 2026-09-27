@@ -1,0 +1,11 @@
+name = "mask2ai"
+compatibility_date = "2026-09-01"
+workers_dev = false
+routes = [
+  { pattern = "mask2ai.com", custom_domain = true },
+  { pattern = "www.mask2ai.com", custom_domain = true }
+]
+
+[assets]
+directory = "./public"
+html_handling = "auto-trailing-slash"
