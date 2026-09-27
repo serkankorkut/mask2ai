@@ -86,7 +86,15 @@ claude --plugin-dir /path/to/pii-mask
 2. Open `chrome://extensions`, enable Developer mode, choose Load unpacked and select the repository folder. The `manifest.json` at the root is the extension. Chrome 111 or newer is required.
 3. Open claude.ai or chatgpt.com. A "pii-mask: on" toast confirms the extension is active.
 
-After changing the extension files, click Reload on the pii-mask card in `chrome://extensions`.
+After changing the extension files, click the Reload icon on the pii-mask card in `chrome://extensions`. The version shown on the card comes from `manifest.json`; if it does not match the file, Chrome is still running the old build.
+
+**First test.** Open a new chat and send a message with made-up data, for example:
+
+```
+Write a short note to jane.doe@example.com confirming her phone +1 555 555 5555 and SSN 111-11-1111.
+```
+
+Expected: a toast "pii-mask: masked 3 values before sending" appears bottom right, your message bubble shows the values you typed, and the reply is written around placeholders the assistant received, shown to you with the real values. To see what actually left the browser, open DevTools, Network, select the `completion` or `conversation` request and look at its payload.
 
 ## What you will see
 
