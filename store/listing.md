@@ -44,12 +44,12 @@ The extension declares no permissions. It uses content scripts on https://claude
 ## Assets to upload
 
 - Icon 128×128: `extension/icons/icon128.png`
-- Screenshots 1280×800: `store/screenshot-chatgpt.png` (take with `node demo/chrome-open.js https://chatgpt.com/` then a 1280×800 capture after sending the first-test message; the purple toast must be visible)
-- Promo tile 440×280: optional
+- Screenshots 1280×800: `store/shot-1-wire.png` (what ChatGPT received), `store/shot-2-restored.png` (what you see). Rendered from frames of `demo/chatgpt-web.gif`; regenerate when the recording changes
+- Small promo tile 440×280: `store/promo-440x280.png`
 
 ## Package
 
-Run `scripts/pack-extension.sh`; upload `dist/mask2ai-extension-<version>.zip`. The zip contains only `manifest.json`, `core/pii.js`, `extension/rewrite.js`, `extension/content.js` and `extension/icons/`.
+Run `scripts/pack-extension.sh`; upload `dist/mask2ai-extension-<version>.zip`. The zip contains `manifest.json` plus every script and icon the manifest references, read from the manifest itself.
 
 ## Steps
 
