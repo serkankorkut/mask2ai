@@ -21,7 +21,7 @@ spawn claude --plugin-dir $root
 expect {
   -re {use this API key} { pause 1000; send "1"; pause 500; send "\033\[13;1u"; exp_continue }
   -re {(?i)trust the files} { pause 1000; send "\033\[13;1u"; exp_continue }
-  -re {pii-mask active} {}
+  -re {mask2ai active} {}
   timeout {}
 }
 expect_background -re {.+} {}

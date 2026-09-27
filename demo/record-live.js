@@ -5,14 +5,14 @@ const { spawnSync } = require('child_process');
 const { connect, sleep } = require('./cdp.js');
 
 const [match, prompt, out, port = '9333'] = process.argv.slice(2);
-const frames = fs.mkdtempSync(path.join(os.tmpdir(), 'pii-mask-frames-'));
+const frames = fs.mkdtempSync(path.join(os.tmpdir(), 'mask2ai-frames-'));
 
 (async () => {
   const b = await connect(+port, match);
   await b.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
   const wire = [];
   b.on(m => { if (m.method === 'Network.requestWillBeSent' && m.params.request.method === 'POST' && /\/(conversation|completion)(\/[a-z_]+)?(\?|$)/.test(m.params.request.url)) wire.push(m.params.request.postData || ''); });
-  const caption = text => b.evaluate(`(() => { let el = document.getElementById('pii-demo-caption'); if (!el) { el = document.createElement('div'); el.id = 'pii-demo-caption'; el.setAttribute('data-pii-mask', ''); el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483646;background:#6b21a8;color:#fff;font:600 17px/1.45 system-ui,sans-serif;padding:14px 22px;white-space:pre-wrap;box-shadow:0 2px 12px rgba(0,0,0,.4)'; document.body.appendChild(el); } el.textContent = ${JSON.stringify(text)}; })()`);
+  const caption = text => b.evaluate(`(() => { let el = document.getElementById('pii-demo-caption'); if (!el) { el = document.createElement('div'); el.id = 'pii-demo-caption'; el.setAttribute('data-mask2ai', ''); el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483646;background:#6b21a8;color:#fff;font:600 17px/1.45 system-ui,sans-serif;padding:14px 22px;white-space:pre-wrap;box-shadow:0 2px 12px rgba(0,0,0,.4)'; document.body.appendChild(el); } el.textContent = ${JSON.stringify(text)}; })()`);
   const sentPrompt = () => {
     for (const w of wire) {
       try { const p = new URLSearchParams(w).get('prompt'); if (p) return p; } catch {}
@@ -39,7 +39,7 @@ const frames = fs.mkdtempSync(path.join(os.tmpdir(), 'pii-mask-frames-'));
   await sleep(700);
   for (const type of ['keyDown', 'keyUp']) await b.send('Input.dispatchKeyEvent', { type, key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
   await sleep(1500);
-  await caption('2 / 3   pii-mask replaced them before the message left your browser. This is what ChatGPT actually received:\n\n' + (sentPrompt() || '(request not captured)'));
+  await caption('2 / 3   mask2ai replaced them before the message left your browser. This is what ChatGPT actually received:\n\n' + (sentPrompt() || '(request not captured)'));
   await sleep(+process.env.REPLY_WAIT || 9000);
   await caption('3 / 3   ChatGPT answered without ever seeing the real email or number. On your screen everything looks normal.');
   await sleep(3500);

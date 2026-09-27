@@ -40,7 +40,7 @@ http.createServer((req, res) => {
     if (tool) {
       const text = tool;
       const pick = type => (text.match(new RegExp(`__PII_${type}_[0-9a-f]{6}__`)) || ['unknown'])[0];
-      return res.end(reply([{ type: 'text', text: `Found her in the file.\n\nEmail: ${pick('EMAIL')}\nPhone: ${pick('PHONE')}\nSSN: ${pick('SSN')}\nTC kimlik no: ${pick('TCKN')}\n\nI only see placeholders for the personal data, which is what pii-mask sends me. Here is the reminder:\n\nSubject: Invoice 1042 is overdue\n\nHi, a quick reminder that invoice 1042 is now past its due date. Please arrange payment or reply if something is wrong. Thank you.` }], 'end_turn'));
+      return res.end(reply([{ type: 'text', text: `Found her in the file.\n\nEmail: ${pick('EMAIL')}\nPhone: ${pick('PHONE')}\nSSN: ${pick('SSN')}\nTC kimlik no: ${pick('TCKN')}\n\nI only see placeholders for the personal data, which is what mask2ai sends me. Here is the reminder:\n\nSubject: Invoice 1042 is overdue\n\nHi, a quick reminder that invoice 1042 is now past its due date. Please arrange payment or reply if something is wrong. Thank you.` }], 'end_turn'));
     }
     if (/customers\.csv/i.test(text)) return res.end(reply([{ type: 'text', text: 'Let me look up her details in the file.' }, { type: 'tool_use', id: 'toolu_' + Date.now(), name: 'Read', input: { file_path: target } }], 'tool_use'));
     res.end(reply([{ type: 'text', text: 'Sure. Which file has her contact details?' }], 'end_turn'));

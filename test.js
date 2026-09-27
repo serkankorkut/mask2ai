@@ -25,7 +25,7 @@ assert.strictEqual(mask(text, {}), masked);
 
 const pii = [
   "Dr. Ayşe Yılmaz will call.\nname: John Smith\n\"firstName\": \"Veli\"\naddress: 123 Main St, Springfield, IL 62704\nAtatürk Mah. Cumhuriyet Cad. No:12 D:3 Kadıköy/İstanbul\nmail ali.yilmaz@x.com, Ali Yılmaz signed, cc ALI YILMAZ.",
-  "name: pii-mask\nversion: 1.2.3\nusername: serkan\naddress: 0x7fffdeadbeef\nhostname: Claude Code\nSee 42 Ways To Go\nBind address: 192.168.1.10"
+  "name: mask2ai\nversion: 1.2.3\nusername: serkan\naddress: 0x7fffdeadbeef\nhostname: Claude Code\nSee 42 Ways To Go\nBind address: 192.168.1.10"
 ];
 const f2 = {};
 const m2 = mask(pii[0], f2);
@@ -81,7 +81,7 @@ const fg = {};
 const gptBody = JSON.parse(rewrite(JSON.stringify({ action: "next", messages: [{ content: { content_type: "text", parts: ["call +90 532 123 45 67"] } }], model: "auto" }), mask, fg));
 assert(/^call __PII_PHONE_[0-9a-f]{6}__$/.test(gptBody.messages[0].content.parts[0]) && gptBody.model === "auto");
 
-const data = fs.mkdtempSync(path.join(os.tmpdir(), 'pii-mask-'));
+const data = fs.mkdtempSync(path.join(os.tmpdir(), 'mask2ai-'));
 const run = input => {
   const r = spawnSync(process.execPath, [path.join(__dirname, 'hooks/mask.js')], {
     input: JSON.stringify({ session_id: 's1', ...input }),
@@ -103,8 +103,8 @@ const post = run({ hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_respo
 const ph = post.hookSpecificOutput.updatedToolOutput.stdout.trim().split(' ')[1];
 assert(/^__PII_EMAIL_[0-9a-f]{6}__$/.test(ph), ph);
 assert.deepStrictEqual(Object.keys(post.hookSpecificOutput.updatedToolOutput), ['stdout', 'stderr', 'interrupted', 'isImage']);
-assert.strictEqual(post.systemMessage, 'pii-mask: masked 1 value in Bash output');
-assert(run({ hook_event_name: 'SessionStart', source: 'startup' }).systemMessage.startsWith('pii-mask active'));
+assert.strictEqual(post.systemMessage, 'mask2ai: masked 1 value in Bash output');
+assert(run({ hook_event_name: 'SessionStart', source: 'startup' }).systemMessage.startsWith('mask2ai active'));
 assert.strictEqual(run({ hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_response: { stdout: 'clean\n', stderr: '' } }), null);
 
 assert.strictEqual(run({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command: 'ls' } }), null);

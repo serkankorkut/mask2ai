@@ -5,7 +5,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { mask, unmask, hasPlaceholder, deepMap } = require('../core/pii.js');
 
-const dir = process.env.CLAUDE_PLUGIN_DATA || path.join(os.homedir(), '.claude', 'pii-mask');
+const dir = process.env.CLAUDE_PLUGIN_DATA || path.join(os.homedir(), '.claude', 'mask2ai');
 const file = id => path.join(dir, `${id}.jsonl`);
 const save = (id, found) => {
   const lines = Object.entries(found).map(([p, v]) => JSON.stringify({ p, v }) + '\n').join('');
@@ -31,7 +31,7 @@ const main = () => {
   const out = o => process.stdout.write(JSON.stringify(o));
   switch (input.hook_event_name) {
     case 'SessionStart':
-      out({ systemMessage: 'pii-mask active: personal data in prompts and tool output is masked before it reaches the model', hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: 'Tokens shaped like __PII_EMAIL_a1b2c3__ are personal data masked by the pii-mask plugin. Treat them as opaque literals: copy them verbatim into tool inputs, never guess, expand or alter them.' } });
+      out({ systemMessage: 'mask2ai active: personal data in prompts and tool output is masked before it reaches the model', hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: 'Tokens shaped like __PII_EMAIL_a1b2c3__ are personal data masked by the mask2ai plugin. Treat them as opaque literals: copy them verbatim into tool inputs, never guess, expand or alter them.' } });
       break;
     case 'UserPromptSubmit': {
       const found = {};
@@ -42,7 +42,7 @@ const main = () => {
       out({
         decision: 'block',
         suppressOriginalPrompt: true,
-        reason: `pii-mask: personal data found in your prompt, nothing was sent. ${copied ? 'A masked copy is in your clipboard, paste it to resend' : 'Resend this masked version'}:\n\n${masked}`
+        reason: `mask2ai: personal data found in your prompt, nothing was sent. ${copied ? 'A masked copy is in your clipboard, paste it to resend' : 'Resend this masked version'}:\n\n${masked}`
       });
       break;
     }
@@ -52,7 +52,7 @@ const main = () => {
       if (!Object.keys(found).length) break;
       save(id, found);
       const n = Object.keys(found).length;
-      out({ systemMessage: `pii-mask: masked ${n} value${n === 1 ? '' : 's'} in ${input.tool_name} output`, hookSpecificOutput: { hookEventName: 'PostToolUse', updatedToolOutput: updated } });
+      out({ systemMessage: `mask2ai: masked ${n} value${n === 1 ? '' : 's'} in ${input.tool_name} output`, hookSpecificOutput: { hookEventName: 'PostToolUse', updatedToolOutput: updated } });
       break;
     }
     case 'PreToolUse': {

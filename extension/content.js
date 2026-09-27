@@ -1,7 +1,7 @@
 (() => {
   const { mask, unmask, hasPlaceholder } = window.pii;
   const { isChatRequest, rewrite } = window.piiRewrite;
-  const KEY = 'pii-mask-map';
+  const KEY = 'mask2ai-map';
   const map = (() => {
     try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch { return {}; }
   })();
@@ -13,9 +13,9 @@
   const style = 'position:fixed;z-index:2147483647;font:13px/1.4 system-ui,sans-serif;color:#fff;background:#6b21a8;border-radius:8px;padding:6px 10px;box-shadow:0 2px 8px rgba(0,0,0,.3);pointer-events:none;';
   const show = (text, ms) => {
     const el = document.createElement('div');
-    el.setAttribute('data-pii-mask', '');
+    el.setAttribute('data-mask2ai', '');
     el.style.cssText = style + 'right:16px;bottom:16px;';
-    el.textContent = '🛡 pii-mask: ' + text;
+    el.textContent = '🛡 mask2ai: ' + text;
     (document.body || document.documentElement).appendChild(el);
     if (ms) setTimeout(() => el.remove(), ms);
   };
@@ -56,7 +56,7 @@
   };
 
   const fix = node => {
-    if (node.nodeType === 3 && hasPlaceholder(node.data) && !node.parentElement?.closest('[contenteditable], textarea, [data-pii-mask]')) node.data = unmask(node.data, map);
+    if (node.nodeType === 3 && hasPlaceholder(node.data) && !node.parentElement?.closest('[contenteditable], textarea, [data-mask2ai]')) node.data = unmask(node.data, map);
   };
   const scan = root => {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);

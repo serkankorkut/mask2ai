@@ -18,7 +18,7 @@ const sendExpr = (endpoint, body, encoding) => encoding === 'gzip'
     const injected = (await b.evaluate('typeof window.pii === "object" && typeof window.piiRewrite === "object"')).value;
     await b.evaluate(sendExpr(endpoint, body, encoding));
     await b.sleep(1500);
-    const shown = (await b.evaluate(`(() => { const d = document.createElement('div'); d.id = 'pii-probe'; d.textContent = 'reply: ' + Object.keys(JSON.parse(sessionStorage.getItem('pii-mask-map') || '{}'))[0]; document.body.appendChild(d); return new Promise(r => setTimeout(() => r(d.textContent), 300)); })()`)).value;
+    const shown = (await b.evaluate(`(() => { const d = document.createElement('div'); d.id = 'pii-probe'; d.textContent = 'reply: ' + Object.keys(JSON.parse(sessionStorage.getItem('mask2ai-map') || '{}'))[0]; document.body.appendChild(d); return new Promise(r => setTimeout(() => r(d.textContent), 300)); })()`)).value;
     await b.close();
     const raw = Buffer.from(posts[0] || '', 'base64');
     const wire = raw[0] === 0x1f && raw[1] === 0x8b ? require('zlib').gunzipSync(raw).toString() : raw.toString();

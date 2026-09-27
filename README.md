@@ -1,6 +1,6 @@
-# pii-mask
+# mask2ai
 
-Keeps personal data on your machine when you work with an AI assistant. pii-mask detects names, contact details, identity numbers, payment details and addresses in what you send, replaces them with placeholders before anything leaves your device, and shows you the real values back.
+Keeps personal data on your machine when you work with an AI assistant. mask2ai detects names, contact details, identity numbers, payment details and addresses in what you send, replaces them with placeholders before anything leaves your device, and shows you the real values back.
 
 Two integrations share one detection core:
 
@@ -14,13 +14,13 @@ Two integrations share one detection core:
 
 ### Claude Code
 
-![pii-mask in Claude Code](demo/claude-code.gif)
+![mask2ai in Claude Code](demo/claude-code.gif)
 
 The real Claude Code terminal with the plugin loaded. The first prompt is blocked and a masked copy is offered. The masked prompt goes through, Claude reads a CSV, the plugin masks 13 values in the tool output before the model sees it, and the model's reply comes back with placeholders that the plugin restores on screen. The model replies in this recording come from `demo/fake-api.js`, a local stand-in for the Anthropic API, so the recording does not depend on an account. The CLI, the hooks and the masking are real.
 
 ### ChatGPT web
 
-![pii-mask on chatgpt.com](demo/chatgpt-web.gif)
+![mask2ai on chatgpt.com](demo/chatgpt-web.gif)
 
 A real chat on chatgpt.com in Chrome with the extension loaded. The purple captions are added by the recorder. The text under "what ChatGPT actually received" is the `prompt` field captured from the outgoing request.
 
@@ -70,23 +70,23 @@ Everything left of the API runs on your machine. The API only receives placehold
 ### Claude Code
 
 ```
-/plugin marketplace add serkankorkut/pii-mask
-/plugin install pii-mask@pii-mask
+/plugin marketplace add serkankorkut/mask2ai
+/plugin install mask2ai@mask2ai
 ```
 
 Choose the user scope to cover every project. Requires Node.js 18 or newer on `PATH`. To try a checkout without installing:
 
 ```
-claude --plugin-dir /path/to/pii-mask
+claude --plugin-dir /path/to/mask2ai
 ```
 
 ### claude.ai and ChatGPT in Chrome
 
 1. Clone or download this repository.
 2. Open `chrome://extensions`, enable Developer mode, choose Load unpacked and select the repository folder. The `manifest.json` at the root is the extension. Chrome 111 or newer is required.
-3. Open claude.ai or chatgpt.com. A "pii-mask: on" toast confirms the extension is active.
+3. Open claude.ai or chatgpt.com. A "mask2ai: on" toast confirms the extension is active.
 
-After changing the extension files, click the Reload icon on the pii-mask card in `chrome://extensions`. The version shown on the card comes from `manifest.json`; if it does not match the file, Chrome is still running the old build.
+After changing the extension files, click the Reload icon on the mask2ai card in `chrome://extensions`. The version shown on the card comes from `manifest.json`; if it does not match the file, Chrome is still running the old build.
 
 **First test.** Open a new chat and send a message with made-up data, for example:
 
@@ -94,15 +94,15 @@ After changing the extension files, click the Reload icon on the pii-mask card i
 Write a short note to jane.doe@example.com confirming her phone +1 555 555 5555 and SSN 111-11-1111.
 ```
 
-Expected: a toast "pii-mask: masked 3 values before sending" appears bottom right, your message bubble shows the values you typed, and the reply is written around placeholders the assistant received, shown to you with the real values. To see what actually left the browser, open DevTools, Network, select the `completion` or `conversation` request and look at its payload.
+Expected: a toast "mask2ai: masked 3 values before sending" appears bottom right, your message bubble shows the values you typed, and the reply is written around placeholders the assistant received, shown to you with the real values. To see what actually left the browser, open DevTools, Network, select the `completion` or `conversation` request and look at its payload.
 
 ## What you will see
 
 **In Claude Code**
 
-- At session start: "pii-mask active: personal data in prompts and tool output is masked before it reaches the model".
+- At session start: "mask2ai active: personal data in prompts and tool output is masked before it reaches the model".
 - When a prompt contains personal data: the prompt is blocked before it is sent and the masked copy is shown. On macOS the masked copy is also placed in the clipboard. Paste it and send.
-- After a tool result is masked: "pii-mask: masked N values in Read output" under the tool call.
+- After a tool result is masked: "mask2ai: masked N values in Read output" under the tool call.
 - When Claude edits a file or runs a command that contains a placeholder, the real value is restored before the tool runs, so edits match and commands work.
 - When Claude's reply contains a placeholder, the real value is shown on screen. The transcript keeps the placeholder.
 
@@ -154,7 +154,7 @@ If you prefer your own instrument, point `ANTHROPIC_BASE_URL` at a logging proxy
 - `SessionStart` returns a status line for the user and one line of context telling the model that `__PII_*__` tokens are opaque literals to copy verbatim.
 - `SessionEnd` deletes the session's placeholder map.
 
-**Detection is an ordered pattern list** in `core/pii.js`. Each entry is a type, a regular expression and an optional validator. Emails run first so their digits are not later read as phones; cards, IBANs and TC numbers run before phones for the same reason. Label, title and cue patterns capture only the value, and a shape check rejects values such as `name: pii-mask` or `address: 0x7fff`. After the static pass, the local part of every masked email is split into tokens, and each token is masked where it appears capitalised or in capitals, accent-insensitively, which is how `jane.doe@` also hides `Jane` and `DOE` in a CSV column.
+**Detection is an ordered pattern list** in `core/pii.js`. Each entry is a type, a regular expression and an optional validator. Emails run first so their digits are not later read as phones; cards, IBANs and TC numbers run before phones for the same reason. Label, title and cue patterns capture only the value, and a shape check rejects values such as `name: mask2ai` or `address: 0x7fff`. After the static pass, the local part of every masked email is split into tokens, and each token is masked where it appears capitalised or in capitals, accent-insensitively, which is how `jane.doe@` also hides `Jane` and `DOE` in a CSV column.
 
 **Placeholders are content-addressed.** A value becomes `__PII_<TYPE>_<6 hex digits of a hash of the value>__`. The same value yields the same placeholder in a prompt, a file read and a grep result without a lookup, hooks running in parallel cannot disagree, and after a resume a single re-read rebuilds the map. Underscores keep the token a single word for the model and harmless inside code.
 
