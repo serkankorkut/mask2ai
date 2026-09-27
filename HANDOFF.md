@@ -9,7 +9,7 @@ Personal-data masking for AI assistants. One detection core, `core/pii.js`, used
 - **Claude Code plugin**: `hooks/hooks.json` registers `hooks/mask.js` for `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `MessageDisplay`, `SessionEnd`. Prompts with personal data are blocked and a masked copy is offered (Claude Code hooks cannot rewrite prompts). Tool output is masked via `updatedToolOutput`, tool input restored via `updatedInput`, replies restored on screen via `MessageDisplay`. Placeholder map is an append-only JSONL under `$CLAUDE_PLUGIN_DATA`, deleted at session end.
 - **Chrome extension**: `manifest.json` at the repo root, scripts in `extension/`. Runs at `document_start` in the page's main world on claude.ai, chatgpt.com and chat.openai.com. Wraps `window.fetch`, rewrites chat request bodies (JSON, form-encoded, byte arrays, gzip-compressed byte arrays), restores placeholders in rendered text with a `MutationObserver`. Map in `sessionStorage`.
 
-Files: `core/zip.js` (dependency-free zip read/write with DecompressionStream) and `core/office.js` mask the XML text of docx/xlsx/pptx in place; `extension/files.js` applies that to `FormData` and `File` request bodies. `hooks/vision.swift` (PDFKit text, Vision OCR with word boxes, CoreGraphics redaction) is compiled by `hooks/mask.js` into `$CLAUDE_PLUGIN_DATA/vision` on first use; PDFs and images are handled in `PreToolUse`: the file is converted (masked text, or redacted image) into `$CLAUDE_PLUGIN_DATA/reads/<session>/` and the Read is redirected with `updatedInput`. Do not do this in `PostToolUse`: Claude Code attaches the original PDF as a `document` block next to the rewritten tool result, so the raw bytes still leave; `demo/prove.js` phase 3 asserts `JVBERi` is absent from the wire. Verified by `demo/prove.js` phases 3 and 4 (macOS only) and the docx upload capture in `demo/verify-web.js`, which posts to a local server from the claude.ai page and needs the `LocalNetworkAccessChecks` feature disabled in the test browser.
+Files: `core/zip.js` (dependency-free zip read/write with DecompressionStream) and `core/office.js` mask the XML text of docx/xlsx/pptx in place; `extension/files.js` applies that to `FormData` and `File` request bodies. `hooks/vision.swift` (PDFKit text, Vision OCR with word boxes, CoreGraphics redaction) is compiled by `hooks/mask.js` into `$CLAUDE_PLUGIN_DATA/vision` on first use; PDFs and images are handled in `PreToolUse`: the file is converted (masked text, or redacted image) into `$CLAUDE_PLUGIN_DATA/reads/<session>/` and the Read is redirected with `updatedInput`, with `permissionDecision: \"allow\"` when the original file is inside the working directory, otherwise Claude Code prompts for the redirected path. Do not do this in `PostToolUse`: Claude Code attaches the original PDF as a `document` block next to the rewritten tool result, so the raw bytes still leave; `demo/prove.js` phase 3 asserts `JVBERi` is absent from the wire. Verified by `demo/prove.js` phases 3 and 4 (macOS only) and the docx upload capture in `demo/verify-web.js`, which posts to a local server from the claude.ai page and needs the `LocalNetworkAccessChecks` feature disabled in the test browser.
 
 Placeholders are `__PII_<TYPE>_<6 hex of cyrb53(value)>__`, content-addressed so masking is deterministic and parallel-safe.
 
@@ -20,7 +20,7 @@ Placeholders are `__PII_<TYPE>_<6 hex of cyrb53(value)>__`, content-addressed so
 | github.com/serkankorkut/mask2ai (public) | `~/repo/mask2ai` | plugin, extension, core, tests, demos, this file |
 | github.com/serkankorkut/mask2ai.com (public) | `~/repo/mask2ai.com` | marketing site, Cloudflare Workers assets, `public/` |
 
-Current version 0.5.0 in `manifest.json`, `.claude-plugin/plugin.json`, `package.json`. Keep the three in sync.
+Current version 0.5.1 in `manifest.json`, `.claude-plugin/plugin.json`, `package.json`. Keep the three in sync.
 
 ## Verify before claiming anything works
 
@@ -39,6 +39,8 @@ node demo/verify-web.js   # headless Chrome loads the extension on claude.ai and
 - Demo data is Jane Doe and John Doe with repetitive numbers (`demo/customers.csv`). `11111111110` and `22222222220` pass the TC checksum.
 
 ## Conventions the owner insists on
+
+See `AGENTS.md` for the release words `DEPLOY ET` and `SYNC ET`.
 
 - Never list a feature or environment that is not verified. The site and README name exactly three: Claude Code CLI, claude.ai in Chrome, ChatGPT web in Chrome.
 - No code comments unless unavoidable; no trailing whitespace; no newline at end of file.

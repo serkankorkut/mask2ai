@@ -20,6 +20,12 @@ Two integrations share one detection core:
 
 The real Claude Code terminal with the plugin loaded. The first prompt is blocked and a masked copy is offered. The masked prompt goes through, Claude reads a CSV, the plugin masks 13 values in the tool output before the model sees it, and the model's reply comes back with placeholders that the plugin restores on screen. The model replies in this recording come from `demo/fake-api.js`, a local stand-in for the Anthropic API, so the recording does not depend on an account. The CLI, the hooks and the masking are real.
 
+### Files in Claude Code
+
+![mask2ai converting a PDF and redacting an image in Claude Code](demo/claude-code-files.gif)
+
+One prompt reads the sample PDF and the sample image. The PDF read is redirected to a masked text extraction, the image read to a redacted copy, and the reply shows what the model was given. The values in the reply are placeholders restored on screen.
+
 ### ChatGPT web
 
 ![mask2ai on chatgpt.com](demo/chatgpt-web.gif)
@@ -190,7 +196,7 @@ node demo/prove.js           # Claude Code wire proof, needs the claude CLI
 node demo/verify-web.js      # extension verification in headless Chrome, needs Google Chrome
 ```
 
-Re-record the Claude Code demo:
+Re-record the Claude Code demos (the files demo uses `demo/claude-code-files.exp` and writes `demo/claude-code-files.cast` and `.gif`):
 
 ```
 node demo/fake-api.js 8790 &
@@ -211,7 +217,7 @@ The marketing site for mask2ai.com lives in its own repository, github.com/serka
 
 ## Continuing the work
 
-`HANDOFF.md` carries the context another person or agent needs to pick this up: repositories, verification commands, recording tricks, conventions and open work.
+`AGENTS.md` holds the working rules and the owner's release words; `HANDOFF.md` carries the context another person or agent needs to pick this up: repositories, verification commands, recording tricks, conventions and open work.
 
 ## License
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "mask2ai",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Masks personal data before it is sent to claude.ai or ChatGPT and shows you the real values back.",
   "minimum_chrome_version": "111",
   "icons": {
