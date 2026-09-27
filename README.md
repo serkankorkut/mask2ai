@@ -166,6 +166,10 @@ If you prefer your own instrument, point `ANTHROPIC_BASE_URL` at a logging proxy
 
 **What still leaves the machine.** Placeholders, everything the patterns do not recognise, file paths, and your prompt once you resend it in masked form.
 
+## Chrome Web Store
+
+`scripts/pack-extension.sh` builds `dist/mask2ai-extension-<version>.zip` containing only the files the extension needs. `store/listing.md` holds the listing text, permissions justification, privacy answers and the submission steps.
+
 ## Development
 
 ```
