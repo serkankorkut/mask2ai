@@ -45,7 +45,11 @@ node demo/verify-web.js   # headless Chrome loads the extension on claude.ai and
 
 ## Site
 
-`~/repo/mask2ai.com/public` is static: `index.html`, `style.css`, `logo.svg`, `logo-dark.svg`, `favicon.svg`, both demo GIFs. Section order is Install, Prerequisites, What it does, Where it works, Verify it, Limits. Deploy with `npm run deploy` from the site repo (wrangler, logged in as the owner's Cloudflare account); custom domains mask2ai.com and www.mask2ai.com are attached. Refresh the GIFs in `public/` when the recordings change.
+`~/repo/mask2ai.com` mirrors the tokenmeter-site structure: `src/layout.html`, `src/pages/{index,install,docs,privacy,404}.html`, `src/static/` (style, script, logo SVGs, GIFs, OG image, llms.txt, robots, Search Console and IndexNow files), `src/logo.svg` and `src/mark.svg` with CSS-variable colours. `node build.mjs` generates `public/` (git-ignored) with JSON-LD, sitemap and robots; the version comes from `../mask2ai/package.json`, so keep both repos side by side or set `MASK2AI_VERSION`. `npm run dev`, `npm run deploy`, `npm run indexnow`. Custom domains mask2ai.com and www.mask2ai.com. Refresh the GIFs in `src/static/` when the recordings change. Section titles start with a capital letter; the owner asked for that explicitly.
+
+## Chrome Web Store
+
+Not yet submitted. `scripts/pack-extension.sh` builds `dist/mask2ai-extension-<version>.zip` with only the extension files; `store/listing.md` has the listing text, permissions justification, privacy answers and steps. The owner must create the developer account, upload the zip and a 1280×800 screenshot showing the toast, and submit. The privacy policy URL is https://mask2ai.com/privacy/.
 
 ## Brand
 
