@@ -2,7 +2,9 @@
 
 # mask2ai
 
-Keeps personal data on your machine when you work with an AI assistant. mask2ai detects names, contact details, identity numbers, payment details and addresses in what you send, replaces them with placeholders before anything leaves your device, and shows you the real values back.
+PII redaction for ChatGPT, claude.ai and Claude Code. mask2ai keeps personal data on your machine when you work with an AI assistant. It detects names, contact details, identity numbers, payment details and addresses in what you send, replaces them with placeholders before anything leaves your device, and shows you the real values back.
+
+Website and docs: [mask2ai.com](https://mask2ai.com)
 
 Two integrations share one detection core:
 
@@ -25,6 +27,10 @@ The real Claude Code terminal with the plugin loaded. The first prompt is blocke
 ![mask2ai converting a PDF and redacting an image in Claude Code](demo/claude-code-files.gif)
 
 One prompt reads the sample PDF and the sample image. The PDF read is redirected to a masked text extraction, the image read to a redacted copy, and the reply shows what the model was given. The values in the reply are placeholders restored on screen.
+
+![demo/customer.png before and after mask2ai: the name, email, phone and SSN are blacked out in the copy Claude Code reads](demo/image-before-after.png)
+
+The redacted copy is real output: `demo/customer-redacted.png` is what the Read tool received in the recording above. Words that match personal data are found by Apple Vision OCR and blacked out in the pixels. The original file is untouched.
 
 ### ChatGPT web
 
