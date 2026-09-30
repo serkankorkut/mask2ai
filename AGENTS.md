@@ -11,6 +11,7 @@ Read `HANDOFF.md` first; it has the architecture, the verification commands and 
 
 - GitHub rulesets (added 2026-09-30 on mask2ai and mask2ai.com): `main` blocks force pushes and deletion; `v*` tags cannot be deleted, moved or overwritten. Normal pushes and new tags work. A history rewrite or re-tag needs the owner to disable the ruleset first in Settings > Rules.
 - `main` also requires a pull request approved by the code owner (`.github/CODEOWNERS` names @serkankorkut) for everyone except the owner, who can push directly. Collaborators cannot merge each other's pull requests without the owner's approval.
+- Only the owner (admin role) can create `v*` tags, so only the owner can cut a release.
 
 - Verify before claiming: `npm test`, `node demo/prove.js`, `node demo/verify-web.js`. Do not list an environment or a file type the checks do not cover.
 - No code comments unless unavoidable. No trailing whitespace. No newline at end of file.
