@@ -15,6 +15,12 @@ const save = (id, found) => {
   fs.mkdirSync(dir, { recursive: true });
   fs.appendFileSync(file(id), lines, { mode: 0o600 });
 };
+const prune = () => {
+  const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  try {
+    for (const f of fs.readdirSync(dir)) if (f.endsWith('.jsonl') && fs.statSync(path.join(dir, f)).mtimeMs < cutoff) fs.rmSync(path.join(dir, f), { force: true });
+  } catch {}
+};
 const load = id => {
   const map = {};
   try {
@@ -151,7 +157,9 @@ const main = () => {
       }
       if (!hasPlaceholder(JSON.stringify(input.tool_input))) break;
       const map = load(id);
-      out({ hookSpecificOutput: { hookEventName: 'PreToolUse', updatedInput: deepMap(input.tool_input, s => unmask(s, map)) } });
+      const restored = deepMap(input.tool_input, s => unmask(s, map));
+      const decision = input.permission_mode === 'bypassPermissions' ? { permissionDecision: 'allow' } : {};
+      out({ hookSpecificOutput: { hookEventName: 'PreToolUse', updatedInput: restored, ...decision } });
       break;
     }
     case 'MessageDisplay':
@@ -159,8 +167,8 @@ const main = () => {
       out({ hookSpecificOutput: { hookEventName: 'MessageDisplay', displayContent: unmask(input.delta, load(id)) } });
       break;
     case 'SessionEnd':
-      fs.rmSync(file(id), { force: true });
       fs.rmSync(readsDir(id), { recursive: true, force: true });
+      prune();
   }
 };
 

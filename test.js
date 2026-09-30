@@ -45,6 +45,9 @@ assert(m3.startsWith("id,first_name,last_name,email,address\n1,__PII_NAME_") && 
 assert.strictEqual(unmask(m3, f3), csv);
 assert.strictEqual(mask("Can you help Deniz? mail: deniz.can@x.com is fine", {}).split("__PII_").length, 4);
 assert.strictEqual(mask("Can you help Deniz? No email here.", {}), "Can you help Deniz? No email here.");
+for (const s of ["{\"name\": \"Bash\", \"id\": 3}", "name: Widget", "owner: Docker", "customer: Acme"]) assert.strictEqual(mask(s, {}), s, s);
+assert(!mask("{\"name\": \"Jane Doe\"}", {}).includes("Jane Doe"));
+assert(!mask("firstName: Jane", {}).includes("Jane"));
 
 const extra = "DOB: 12/03/1988, doğum tarihi: 12.03.1988, passport no: U12345678, kimlik no 12345678901, plaka 34 ABC 123, from 85.105.23.11, local 192.168.1.10 and 10.0.0.1 and 127.0.0.1, version 1.2.3.4 is not an ip";
 const fx = {};
@@ -172,6 +175,10 @@ assert.strictEqual(display.hookSpecificOutput.displayContent, 'Found veli@exampl
 
 assert(fs.existsSync(path.join(data, 's1.jsonl')));
 run({ hook_event_name: 'SessionEnd', reason: 'other' });
-assert(!fs.existsSync(path.join(data, 's1.jsonl')));
+assert(fs.existsSync(path.join(data, 's1.jsonl')));
+const afterEnd = run({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command: `echo ${ph}` } });
+assert.strictEqual(afterEnd.hookSpecificOutput.updatedInput.command, 'echo veli@example.com');
+assert.strictEqual(afterEnd.hookSpecificOutput.permissionDecision, undefined);
+assert.strictEqual(run({ hook_event_name: 'PreToolUse', tool_name: 'Bash', permission_mode: 'bypassPermissions', tool_input: { command: `echo ${ph}` } }).hookSpecificOutput.permissionDecision, 'allow');
 fs.rmSync(data, { recursive: true });
 console.log('ok');

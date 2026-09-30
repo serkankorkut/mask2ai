@@ -42,6 +42,7 @@
     return rem === 1;
   };
 
+  const fullNameLike = s => /^(?:\p{Lu}\p{Ll}+|\p{Lu}{2,})(?:[ \t]+(?:\p{Lu}\p{Ll}+|\p{Lu}{2,})){1,3}$/u.test(s);
   const personLike = s => /^(?:\p{Lu}\p{Ll}+|\p{Lu}{2,})(?:[ \t]+(?:\p{Lu}\p{Ll}+|\p{Lu}{2,})){0,3}$/u.test(s);
   const addressLike = s => /\d/.test(s) && /\p{L}{3}/u.test(s) && !/^(?:0x|\d+\.\d+\.\d+\.\d+)/i.test(s);
 
@@ -61,7 +62,8 @@
     ['IP', /(?<!version\s)(?<!\bv)\b(?!(?:10|127|0)\.)(?!192\.168\.)(?!172\.(?:1[6-9]|2\d|3[01])\.)(?!169\.254\.)(?:25[0-5]|2[0-4]\d|1?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3}\b/g],
     ['NAME', /(?<!\p{L})(?:[Mm]y name is|I am|I'm|[Dd]ear|[Rr]egards|[Ss]incerely|[Bb]est regards|[Kk]ind regards|[Cc]heers|[Bb]enim adım|[Bb]en|[Mm]erhaba|[Ss]aygılar(?:ımla)?|[Ss]evgiler)\s*,?\s+(\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+){1,2})/gu],
     ['NAME', /(?<!\p{L})(?:Mr|Mrs|Ms|Miss|Dr|Prof|Sayın|Sn|Bay|Bayan)\.?\s+(\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+){0,2})/gu],
-    ['NAME', /(?<![\p{L}_])(?:full[ _-]?name|first[ _-]?name|last[ _-]?name|given[ _-]?name|family[ _-]?name|surname|customer(?:[ _-]?name)?|contact(?:[ _-]?name)?|owner|patient|employee|name|ad[ _-]?soyad|adı[ _-]?soyadı|isim|müşteri|hasta)\s*["']?\s*[:=]\s*["']?([^\n,;"']{2,60}?)\s*(?=[\n,;"']|$)/giu, personLike]
+    ['NAME', /(?<![\p{L}_])(?:first[ _-]?name|last[ _-]?name|given[ _-]?name|family[ _-]?name|surname|ad|soyad)\s*["']?\s*[:=]\s*["']?([^\n,;"']{2,60}?)\s*(?=[\n,;"']|$)/giu, personLike],
+    ['NAME', /(?<![\p{L}_])(?:full[ _-]?name|customer(?:[ _-]?name)?|contact(?:[ _-]?name)?|owner|patient|employee|name|ad[ _-]?soyad|adı[ _-]?soyadı|isim|müşteri|hasta)\s*["']?\s*[:=]\s*["']?([^\n,;"']{2,60}?)\s*(?=[\n,;"']|$)/giu, fullNameLike]
   ];
   const FOLD = { i: ['[Iİ]', '[iı]'], s: ['[SŞ]', '[sş]'], c: ['[CÇ]', '[cç]'], g: ['[GĞ]', '[gğ]'], o: ['[OÖ]', '[oö]'], u: ['[UÜ]', '[uü]'] };
   const nameForms = t => {

@@ -6,7 +6,7 @@ Context for continuing mask2ai on another machine or with another agent. Read th
 
 Personal-data masking for AI assistants. One detection core, `core/pii.js`, used by two integrations:
 
-- **Claude Code plugin**: `hooks/hooks.json` registers `hooks/mask.js` for `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `MessageDisplay`, `SessionEnd`. Prompts with personal data are blocked and a masked copy is offered (Claude Code hooks cannot rewrite prompts). Tool output is masked via `updatedToolOutput`, tool input restored via `updatedInput`, replies restored on screen via `MessageDisplay`. Placeholder map is an append-only JSONL under `$CLAUDE_PLUGIN_DATA`, deleted at session end.
+- **Claude Code plugin**: `hooks/hooks.json` registers `hooks/mask.js` for `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `MessageDisplay`, `SessionEnd`. Prompts with personal data are blocked and a masked copy is offered (Claude Code hooks cannot rewrite prompts). Tool output is masked via `updatedToolOutput`, tool input restored via `updatedInput`, replies restored on screen via `MessageDisplay`. Placeholder map is an append-only JSONL under `$CLAUDE_PLUGIN_DATA`, kept 30 days (not deleted at session end: the desktop app fires SessionEnd on pause and resumes later, which wiped maps and left placeholders unrestored in commands on 2026-09-30). On PreToolUse restore, `permissionDecision: allow` is passed through only when the session is already in bypassPermissions mode.
 - **Chrome extension**: `manifest.json` at the repo root, scripts in `extension/`. Runs at `document_start` in the page's main world on claude.ai, chatgpt.com and chat.openai.com. Wraps `window.fetch`, rewrites chat request bodies (JSON, form-encoded, byte arrays, gzip-compressed byte arrays), restores placeholders in rendered text with a `MutationObserver`. Map in `sessionStorage`.
 
 Files: `core/zip.js` (dependency-free zip read/write with DecompressionStream) and `core/office.js` mask the XML text of docx/xlsx/pptx in place; `extension/files.js` applies that to `FormData` and `File` request bodies. `hooks/vision.swift` (PDFKit text, Vision OCR with word boxes, CoreGraphics redaction) is compiled by `hooks/mask.js` into `$CLAUDE_PLUGIN_DATA/vision` on first use; PDFs and images are handled in `PreToolUse`: the file is converted (masked text, or redacted image) into `$CLAUDE_PLUGIN_DATA/reads/<session>/` and the Read is redirected with `updatedInput`, with `permissionDecision: \"allow\"` when the original file is inside the working directory, otherwise Claude Code prompts for the redirected path. Do not do this in `PostToolUse`: Claude Code attaches the original PDF as a `document` block next to the rewritten tool result, so the raw bytes still leave; `demo/prove.js` phase 3 asserts `JVBERi` is absent from the wire. Verified by `demo/prove.js` phases 3 and 4 (macOS only) and the docx upload capture in `demo/verify-web.js`, which posts to a local server from the claude.ai page and needs the `LocalNetworkAccessChecks` feature disabled in the test browser.
@@ -60,6 +60,10 @@ Not yet submitted. `scripts/pack-extension.sh` builds `dist/mask2ai-extension-<v
 ## Brand
 
 Logo from the owner's Claude Design export: document → mask → robot mark, plus the mask alone as the app icon. Ink `#171a21`, accent `#7c3aed` (light) and `#a78bfa` (dark), paper `#f6f5f1`. Sources in `brand/`; extension icons in `extension/icons/` are rendered from `brand/icon.svg` with headless Chrome screenshots at 16, 32, 48 and 128 px. The brief that produced it is `brand/logo-brief.md` in the site repo.
+
+## Known false positives fixed
+
+- `"name": "Bash"` was masked as a person name and the model then called a tool named by the placeholder. Generic name labels now need two or more capitalised words (`fullNameLike`); first/last-name labels still take one.
 
 ## Open work, in priority order
 
