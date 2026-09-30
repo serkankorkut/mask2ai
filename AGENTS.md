@@ -18,3 +18,4 @@ Read `HANDOFF.md` first; it has the architecture, the verification commands and 
 - Commit messages: `type: Capitalised summary`, no attribution lines.
 - Demo data is Jane Doe and John Doe with repetitive numbers.
 - Keep `manifest.json`, `.claude-plugin/plugin.json` and `package.json` at the same version; the site reads it.
+- After the extension is on the Chrome Web Store, write its item ID to `store/id.txt`; the site reads it for the store badges.

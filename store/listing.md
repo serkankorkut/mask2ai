@@ -51,6 +51,10 @@ The extension declares no permissions. It uses content scripts on https://claude
 
 Run `scripts/pack-extension.sh`; upload `dist/mask2ai-extension-<version>.zip`. The zip contains `manifest.json` plus every script and icon the manifest references, read from the manifest itself.
 
+## After publishing
+
+Put the 32-letter item ID from the store URL into `store/id.txt` (no newline) and commit. The marketing site build picks it up and shows the Chrome Web Store user and version badges on the home page.
+
 ## Steps
 
 1. Register at https://chrome.google.com/webstore/devconsole (one-time developer fee).
