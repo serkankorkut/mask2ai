@@ -124,7 +124,7 @@ const main = () => {
       out({
         decision: 'block',
         suppressOriginalPrompt: true,
-        reason: `mask2ai: personal data found in your prompt, nothing was sent. ${copied ? 'A masked copy is in your clipboard, paste it to resend' : 'Resend this masked version'}:\n\n${masked}`
+        reason: `mask2ai: personal data found in your prompt, nothing was sent. ${copied ? 'A masked copy is in your clipboard: press Edit prompt, select all, paste, send. In the terminal just paste and send' : 'Resend this masked version'}:\n\n${masked}`
       });
       break;
     }
