@@ -118,7 +118,7 @@ claude --plugin-dir /path/to/mask2ai
 
 ### claude.ai and ChatGPT in Chrome
 
-1. Clone or download this repository.
+1. Clone this repository, or download `mask2ai-extension-<version>.zip` from the [latest release](https://github.com/serkankorkut/mask2ai/releases/latest) and unzip it.
 2. Open `chrome://extensions`, enable Developer mode, choose Load unpacked and select the repository folder. The `manifest.json` at the root is the extension. Chrome 111 or newer is required.
 3. Open claude.ai or chatgpt.com. A "mask2ai: on" toast confirms the extension is active.
 
@@ -146,6 +146,28 @@ Expected: a toast "mask2ai: masked 3 values before sending" appears bottom right
 
 - A toast reports how many values were masked each time you send a message.
 - The assistant replies with placeholders; the page shows the real values. The placeholder map lives in the tab's `sessionStorage` and is gone when the tab closes.
+
+## Configuration
+
+Everything is on by default. One JSON object turns detector types off, adds your own patterns, or lists values that must never be masked. The same object works in Claude Code and in the Chrome extension.
+
+```json
+{
+  "disable": ["TCKN", "PLATE"],
+  "extra": [{ "type": "EMPLOYEE_ID", "pattern": "EMP-\\d{6}" }],
+  "allow": ["support@acme.com"]
+}
+```
+
+| Key | Meaning |
+| --- | --- |
+| `disable` | Types to switch off: `EMAIL`, `IBAN`, `CARD`, `TCKN`, `SSN`, `PHONE`, `ADDRESS`, `DOB`, `ID`, `PLATE`, `IP`, `NAME`. Country-specific detectors such as the Turkish ID number or licence plate are the usual candidates. |
+| `extra` | Your own detectors: a `type` name that becomes the placeholder label and a JavaScript regular expression in `pattern`, with optional `flags`. Matches are masked and restored like everything else. |
+| `allow` | Exact values that are never masked, such as a shared support address. |
+
+**Claude Code** reads, in this order, the file named in `MASK2AI_CONFIG`, then `.mask2ai.json` in the working directory, then `~/.mask2ai/config.json`. The first one found wins and the session start line names it. A file that does not parse is ignored and the line says so.
+
+**Chrome**: right-click the mask2ai icon, choose Options, paste the JSON and save. It is kept in Chrome storage and applies after the tab reloads.
 
 ## Verify
 

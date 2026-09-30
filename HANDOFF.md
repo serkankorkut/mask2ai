@@ -11,6 +11,8 @@ Personal-data masking for AI assistants. One detection core, `core/pii.js`, used
 
 Files: `core/zip.js` (dependency-free zip read/write with DecompressionStream) and `core/office.js` mask the XML text of docx/xlsx/pptx in place; `extension/files.js` applies that to `FormData` and `File` request bodies. `hooks/vision.swift` (PDFKit text, Vision OCR with word boxes, CoreGraphics redaction) is compiled by `hooks/mask.js` into `$CLAUDE_PLUGIN_DATA/vision` on first use; PDFs and images are handled in `PreToolUse`: the file is converted (masked text, or redacted image) into `$CLAUDE_PLUGIN_DATA/reads/<session>/` and the Read is redirected with `updatedInput`, with `permissionDecision: \"allow\"` when the original file is inside the working directory, otherwise Claude Code prompts for the redirected path. Do not do this in `PostToolUse`: Claude Code attaches the original PDF as a `document` block next to the rewritten tool result, so the raw bytes still leave; `demo/prove.js` phase 3 asserts `JVBERi` is absent from the wire. Verified by `demo/prove.js` phases 3 and 4 (macOS only) and the docx upload capture in `demo/verify-web.js`, which posts to a local server from the claude.ai page and needs the `LocalNetworkAccessChecks` feature disabled in the test browser.
 
+Configuration: `core/pii.js` exports `configure({disable, extra, allow})`; the hook loads `$MASK2AI_CONFIG`, `<cwd>/.mask2ai.json` or `~/.mask2ai/config.json`; the extension has `extension/options.html` (chrome.storage.sync) and `extension/bridge.js` (isolated world) which posts the config into the main world for `content.js`. `manifest.json` therefore declares the `storage` permission.
+
 Placeholders are `__PII_<TYPE>_<6 hex of cyrb53(value)>__`, content-addressed so masking is deterministic and parallel-safe.
 
 ## Repositories
@@ -20,7 +22,7 @@ Placeholders are `__PII_<TYPE>_<6 hex of cyrb53(value)>__`, content-addressed so
 | github.com/serkankorkut/mask2ai (public) | `~/repo/mask2ai` | plugin, extension, core, tests, demos, this file |
 | github.com/serkankorkut/mask2ai.com (public) | `~/repo/mask2ai.com` | marketing site, Cloudflare Workers assets, `public/` |
 
-Current version 0.5.2 in `manifest.json`, `.claude-plugin/plugin.json`, `package.json`. Keep the three in sync.
+Current version 0.6.0 in `manifest.json`, `.claude-plugin/plugin.json`, `package.json`. Keep the three in sync.
 
 ## Verify before claiming anything works
 

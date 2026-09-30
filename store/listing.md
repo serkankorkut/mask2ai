@@ -39,7 +39,7 @@ English
 
 ## Permissions justification
 
-The extension declares no permissions. It uses content scripts on https://claude.ai/*, https://chatgpt.com/* and https://chat.openai.com/* only, which is the minimum needed to rewrite the chat request before it is sent and to restore placeholders in the rendered page. It makes no network requests of its own.
+The extension declares one permission, `storage`, to keep the optional configuration JSON from its options page. It uses content scripts on https://claude.ai/*, https://chatgpt.com/* and https://chat.openai.com/* only, which is the minimum needed to rewrite the chat request before it is sent and to restore placeholders in the rendered page. It makes no network requests of its own.
 
 ## Privacy practices (data usage form)
 

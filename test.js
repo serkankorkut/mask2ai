@@ -3,7 +3,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { mask, unmask, luhn, tckn, iban } = require('./core/pii.js');
+const { mask, unmask, luhn, tckn, iban, configure, TYPES } = require('./core/pii.js');
 const { isChatRequest, rewrite } = require('./extension/rewrite.js');
 const zip = require('./core/zip.js');
 const office = require('./core/office.js');
@@ -126,6 +126,16 @@ assert(/^call __PII_PHONE_[0-9a-f]{6}__$/.test(gptBody.messages[0].content.parts
   assert.strictEqual(files.classify("photo.HEIC"), "opaque");
   console.log("office ok");
 })().catch(e => { console.error(e); process.exit(1); });
+
+assert.deepStrictEqual(TYPES, ["EMAIL", "IBAN", "CARD", "TCKN", "SSN", "PHONE", "ADDRESS", "DOB", "ID", "PLATE", "IP", "NAME"]);
+configure({ disable: ["tckn", "PLATE"], allow: ["support@acme.com"], extra: [{ type: "employee id", pattern: "EMP-\\d{6}" }] });
+const mc = mask("id 10000000146, plate 34 ABC 123, mail support@acme.com and jane.doe@example.com, badge EMP-123456", {});
+assert(mc.includes("10000000146") && mc.includes("34 ABC 123") && mc.includes("support@acme.com"), mc);
+assert(!mc.includes("jane.doe") && /__PII_EMPLOYEEID_[0-9a-f]{6}__/.test(mc), mc);
+configure({ disable: ["NAME"] });
+assert(mask("Dr. Jane Doe and jane.doe@example.com", {}).includes("Jane Doe"));
+configure({});
+assert(!mask("Dr. Jane Doe", {}).includes("Jane Doe"));
 
 const data = fs.mkdtempSync(path.join(os.tmpdir(), 'mask2ai-'));
 const run = input => {

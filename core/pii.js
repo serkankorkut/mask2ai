@@ -70,6 +70,14 @@
     const cap = l.map((ch, i) => FOLD[ch] ? FOLD[ch][i ? 1 : 0] : i ? ch : ch.toUpperCase()).join('');
     return `(?:${cap}|${upper})`;
   };
+  const TYPES = [...new Set(PATTERNS.map(p => p[0]))];
+  const config = { disable: new Set(), extra: [], allow: new Set() };
+  const configure = cfg => {
+    config.disable = new Set((cfg && cfg.disable || []).map(t => String(t).toUpperCase()));
+    config.allow = new Set(cfg && cfg.allow || []);
+    config.extra = (cfg && cfg.extra || []).map(e => [String(e.type || 'CUSTOM').toUpperCase().replace(/[^A-Z]/g, '') || 'CUSTOM', new RegExp(e.pattern, 'g' + (e.flags || '').replace(/g/g, ''))]);
+    return config;
+  };
   const PLACEHOLDER = /__PII_[A-Z]+_[0-9a-f]{6}__/g;
   const hasPlaceholder = s => /__PII_[A-Z]+_[0-9a-f]{6}__/.test(s);
 
@@ -77,6 +85,7 @@
     const m = args[0];
     const val = typeof args[1] === 'string' ? args[1] : m;
     if (check && !check(val)) return m;
+    if (config.allow.has(val)) return m;
     const p = `__PII_${type}_${hash(val)}__`;
     found[p] = val;
     return m.replace(val, p);
@@ -91,8 +100,8 @@
     .flat();
 
   const mask = (text, found) => {
-    for (const [type, re, check] of PATTERNS) text = apply(text, type, re, check, found);
-    for (const re of namesFromEmails(found, text)) text = apply(text, 'NAME', re, null, found);
+    for (const [type, re, check] of [...PATTERNS, ...config.extra]) if (!config.disable.has(type)) text = apply(text, type, re, check, found);
+    if (!config.disable.has('NAME')) for (const re of namesFromEmails(found, text)) text = apply(text, 'NAME', re, null, found);
     return text;
   };
   const unmask = (text, map) => text.replace(PLACEHOLDER, p => map[p] ?? p);
@@ -101,5 +110,5 @@
     : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, deepMap(x, fn)]))
     : v;
 
-  return { mask, unmask, luhn, tckn, iban, hasPlaceholder, deepMap, PLACEHOLDER };
+  return { mask, unmask, luhn, tckn, iban, hasPlaceholder, deepMap, PLACEHOLDER, TYPES, configure };
 });

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "mask2ai",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Masks personal data before your message reaches claude.ai or ChatGPT, then shows the real values on your screen.",
   "minimum_chrome_version": "111",
   "icons": {
@@ -9,6 +9,13 @@
     "32": "extension/icons/icon32.png",
     "48": "extension/icons/icon48.png",
     "128": "extension/icons/icon128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "options_ui": {
+    "page": "extension/options.html",
+    "open_in_tab": false
   },
   "content_scripts": [
     {
@@ -27,6 +34,17 @@
       ],
       "run_at": "document_start",
       "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://claude.ai/*",
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": [
+        "extension/bridge.js"
+      ],
+      "run_at": "document_start"
     }
   ]
 }

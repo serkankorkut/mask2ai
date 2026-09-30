@@ -3,7 +3,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { mask, unmask, hasPlaceholder, deepMap } = require('../core/pii.js');
+const { mask, unmask, hasPlaceholder, deepMap, configure } = require('../core/pii.js');
 const { execFileSync } = require('child_process');
 const crypto = require('crypto');
 
@@ -92,13 +92,28 @@ const redirectImage = (id, input, found) => {
   };
 };
 
+const loadConfig = cwd => {
+  const candidates = [process.env.MASK2AI_CONFIG, cwd && path.join(cwd, '.mask2ai.json'), path.join(os.homedir(), '.mask2ai', 'config.json')].filter(Boolean);
+  for (const file of candidates) {
+    if (!fs.existsSync(file)) continue;
+    try {
+      configure(JSON.parse(fs.readFileSync(file, 'utf8')));
+      return { file };
+    } catch (e) {
+      return { file, error: e.message };
+    }
+  }
+  return null;
+};
+
 const main = () => {
   const input = JSON.parse(fs.readFileSync(0, 'utf8'));
+  const cfg = loadConfig(input.cwd);
   const id = input.session_id;
   const out = o => process.stdout.write(JSON.stringify(o));
   switch (input.hook_event_name) {
     case 'SessionStart':
-      out({ systemMessage: 'mask2ai active: personal data in prompts and tool output is masked before it reaches the model', hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: 'Tokens shaped like __PII_EMAIL_a1b2c3__ are personal data masked by the mask2ai plugin. Treat them as opaque literals: copy them verbatim into tool inputs, never guess, expand or alter them.' } });
+      out({ systemMessage: 'mask2ai active: personal data in prompts and tool output is masked before it reaches the model' + (cfg ? (cfg.error ? `. Config ${cfg.file} ignored: ${cfg.error}` : `. Config: ${cfg.file}`) : ''), hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: 'Tokens shaped like __PII_EMAIL_a1b2c3__ are personal data masked by the mask2ai plugin. Treat them as opaque literals: copy them verbatim into tool inputs, never guess, expand or alter them.' } });
       break;
     case 'UserPromptSubmit': {
       const found = {};

@@ -1,5 +1,6 @@
 (() => {
-  const { mask, unmask, hasPlaceholder } = window.pii;
+  const { mask, unmask, hasPlaceholder, configure } = window.pii;
+  window.addEventListener('message', e => { if (e.source === window && e.data && e.data.type === 'mask2ai-config') configure(e.data.config); });
   const { isChatRequest, rewrite } = window.piiRewrite;
   const { maskFile, maskFormData } = window.mask2aiFiles;
   const KEY = 'mask2ai-map';

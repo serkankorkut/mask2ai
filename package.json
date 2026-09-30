@@ -1,6 +1,6 @@
 {
   "name": "mask2ai",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Masks personal data before it reaches an AI assistant. Claude Code plugin and Chrome extension for claude.ai and ChatGPT.",
   "private": true,
   "license": "MIT",

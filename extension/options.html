@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mask2ai options</title>
+<style>
+body { font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 20px; max-width: 44rem; color: #1c1b18; }
+h1 { font-size: 18px; margin: 0 0 4px; }
+p { margin: 0 0 12px; color: #555; }
+textarea { width: 100%; height: 16rem; font: 13px/1.5 ui-monospace, Menlo, monospace; box-sizing: border-box; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+button { font: inherit; padding: 6px 14px; border-radius: 6px; border: 1px solid #7c3aed; background: #7c3aed; color: #fff; cursor: pointer; margin-top: 10px; }
+#status { margin-left: 10px; color: #555; }
+code { background: #f1efe8; padding: 0 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<h1>mask2ai configuration</h1>
+<p>One JSON object. <code>disable</code> switches detector types off, <code>extra</code> adds your own patterns, <code>allow</code> lists exact values never to mask. Leave it empty to mask everything. Types: EMAIL, IBAN, CARD, TCKN, SSN, PHONE, ADDRESS, DOB, ID, PLATE, IP, NAME.</p>
+<textarea id="config" spellcheck="false" placeholder='{
+  "disable": ["TCKN", "PLATE"],
+  "extra": [{ "type": "EMPLOYEE_ID", "pattern": "EMP-\\d{6}" }],
+  "allow": ["support@acme.com"]
+}'></textarea>
+<div><button id="save" type="button">Save</button><span id="status"></span></div>
+<script src="options.js"></script>
+</body>
+</html>
