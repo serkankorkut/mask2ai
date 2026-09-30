@@ -21,11 +21,17 @@ Before a message leaves claude.ai or chatgpt.com, the extension finds email addr
 - The placeholder map lives in the tab and disappears when you close it.
 - Open source, MIT: https://github.com/serkankorkut/mask2ai
 
+Not affiliated with OpenAI or Anthropic.
+
 Detection is pattern based. A bare name in free text with no title, label or matching email nearby is not detected. Full list of what is and is not caught: https://mask2ai.com/docs/
+
+## Single purpose
+
+Replace personal data in messages sent to claude.ai and ChatGPT with placeholders, and restore the real values on screen.
 
 ## Category
 
-Productivity › Workflow & Planning (or Privacy & Security if offered)
+Make Chrome Yours › Privacy & Security
 
 ## Language
 
@@ -37,15 +43,25 @@ The extension declares no permissions. It uses content scripts on https://claude
 
 ## Privacy practices (data usage form)
 
-- Does not collect or transmit user data. All processing happens in the page; the placeholder map is kept in sessionStorage and never leaves the browser.
+Google requires disclosure even when data is only processed locally, so tick these data types:
+
+- Personally identifiable information (names, emails, phone, national ID numbers, addresses)
+- Financial and payment information (card numbers, IBANs)
+- Personal communications (the chat message being sent)
+- Website content (the rendered chat page and uploaded files)
+
+Justification for each: processed only inside the open tab to find and replace personal data; never transmitted, stored outside the tab's sessionStorage, or shared.
+
+Tick all three certifications: not sold to third parties, not used for purposes unrelated to the single purpose, not used for creditworthiness or lending.
+
 - No remote code. All scripts are packaged.
 - Privacy policy URL: https://mask2ai.com/privacy/
 
 ## Assets to upload
 
-- Icon 128×128: `extension/icons/icon128.png`
+- Icon 128×128: `store/icon-128.png` (96px artwork with 16px transparent padding, as the store asks)
 - Screenshots 1280×800: `store/shot-1-wire.png` (what ChatGPT received), `store/shot-2-restored.png` (what you see). Rendered from frames of `demo/chatgpt-web.gif`; regenerate when the recording changes
-- Small promo tile 440×280: `store/promo-440x280.png`
+- Small promo tile 440×280: `store/promo-440x280.png` (logo and one placeholder example, no headline)
 
 ## Package
 
@@ -59,6 +75,7 @@ Put the 32-letter item ID from the store URL into `store/id.txt` (no newline) an
 
 1. Register at https://chrome.google.com/webstore/devconsole (one-time developer fee).
 2. New item, upload the zip.
-3. Fill the store listing from this file, upload the icon and at least one screenshot.
+3. Fill the store listing from this file, upload the icon and at least one screenshot. Homepage and support URL: https://mask2ai.com
 4. Privacy tab: answer as above, set the privacy policy URL.
-5. Submit for review. First review usually takes a few days. Content scripts on two hosts and no permissions keeps it in the fast lane.
+5. Account tab: verify the contact email and declare trader or non-trader status (EU).
+6. Submit for review. First review usually takes a few days. Content scripts on three hosts and no permissions keep it in the fast lane.

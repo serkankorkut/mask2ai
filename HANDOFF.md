@@ -20,7 +20,7 @@ Placeholders are `__PII_<TYPE>_<6 hex of cyrb53(value)>__`, content-addressed so
 | github.com/serkankorkut/mask2ai (public) | `~/repo/mask2ai` | plugin, extension, core, tests, demos, this file |
 | github.com/serkankorkut/mask2ai.com (public) | `~/repo/mask2ai.com` | marketing site, Cloudflare Workers assets, `public/` |
 
-Current version 0.5.1 in `manifest.json`, `.claude-plugin/plugin.json`, `package.json`. Keep the three in sync.
+Current version 0.5.2 in `manifest.json`, `.claude-plugin/plugin.json`, `package.json`. Keep the three in sync.
 
 ## Verify before claiming anything works
 

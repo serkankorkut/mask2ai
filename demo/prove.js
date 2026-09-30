@@ -85,8 +85,9 @@ server.listen(0, '127.0.0.1', async () => {
   for (const s of leaked) for (const m of wire.matchAll(new RegExp('(?<![A-Za-z])' + escape(s) + '(?![A-Za-z])', 'gu'))) console.log(`   context: …${wire.slice(Math.max(0, m.index - 80), m.index + s.length + 40).replace(/\s+/g, ' ')}…`);
   if (leaked.length || !placeholders.size) process.exit(1);
 
-  const vision = path.join(env.CLAUDE_PLUGIN_DATA || path.join(require('os').homedir(), '.claude', 'mask2ai'), 'vision');
+  const vision = path.join(require('os').tmpdir(), 'mask2ai-proof-vision');
   if (process.platform === 'darwin') {
+    require('child_process').execFileSync('swiftc', ['-O', '-o', vision, path.join(__dirname, '..', 'hooks', 'vision.swift')]);
     console.log('\n3. a PDF containing personal data');
     const c = await requestsOf(() => claude(env, 'Read demo/customer.pdf'));
     if (c.code !== 0) fail(`claude exited ${c.code}\n${c.out}`);

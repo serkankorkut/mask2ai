@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/github/license/serkankorkut/mask2ai?style=flat-square)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/serkankorkut/mask2ai?style=flat-square)](https://github.com/serkankorkut/mask2ai/stargazers)
 
-Protects your privacy when you use AI. mask2ai keeps personal data on your machine when you work with an AI assistant. It detects names, contact details, identity numbers, payment details and addresses in what you send, replaces them with placeholders before anything leaves your device, and shows you the real values back.
+Protects your privacy when you use AI. mask2ai keeps personal data on your machine when you work with an AI assistant. It detects names, contact details, identity numbers, payment details and addresses in what you send, replaces them with placeholders before anything leaves your device, and puts the real values back on your screen.
 
 Website and docs: [mask2ai.com](https://mask2ai.com)
 
