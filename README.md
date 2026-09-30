@@ -101,6 +101,12 @@ Everything left of the API runs on your machine. The API only receives placehold
 ### Claude Code
 
 ```
+/plugin install mask2ai --marketplace serkankorkut/mask2ai
+```
+
+Claude Code asks you to confirm the marketplace source, then to pick a scope. On Claude Code older than 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add serkankorkut/mask2ai
 /plugin install mask2ai@mask2ai
 ```
