@@ -70,6 +70,7 @@ Detection is pattern based and works in English and Turkish. Structured identifi
 | Office: .docx, .xlsx, .pptx | Claude reads these through scripts, whose text output is masked | masked in place when uploaded: the XML text inside the zip is rewritten, formatting and images untouched |
 | PDF | the Read is redirected to a masked text extraction (PDFKit); the raw PDF is never read by the model. A PDF with no extractable text is withheld | uploaded uninspected, a toast says so |
 | Image: .png, .jpg, .gif, .webp | the Read is redirected to a copy where the words that match, found by Apple Vision OCR, are blacked out in the pixels | uploaded uninspected, a toast says so |
+| Image pasted into the prompt | the prompt is blocked when OCR finds personal data in it; a redacted copy is written next to the original and named in the message, attach that instead | not inspected |
 
 PDF and image handling in Claude Code needs macOS with the Swift toolchain (`xcode-select --install`); the helper in `hooks/vision.swift` is compiled once into the plugin data directory on first use. On other systems PDFs and images pass through with a warning.
 
@@ -138,6 +139,7 @@ Expected: a toast "mask2ai: masked 3 values before sending" appears bottom right
 
 - At session start: "mask2ai active: personal data in prompts and tool output is masked before it reaches the model".
 - When a prompt contains personal data: the prompt is blocked before it is sent and the masked copy is shown. On macOS the masked copy is also placed in the clipboard. Paste it and send.
+- When an image pasted into the prompt contains personal data: the prompt is blocked, the message names a redacted copy of the image, and you attach that copy instead. An image cannot be swapped inside a prompt the way a file read can, so this is a block rather than a silent fix.
 - After a tool result is masked: "mask2ai: masked N values in Read output" under the tool call.
 - When Claude edits a file or runs a command that contains a placeholder, the real value is restored before the tool runs, so edits match and commands work.
 - When Claude's reply contains a placeholder, the real value is shown on screen. The transcript keeps the placeholder.

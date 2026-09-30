@@ -61,6 +61,8 @@ Not yet submitted. `scripts/pack-extension.sh` builds `dist/mask2ai-extension-<v
 
 Logo from the owner's Claude Design export: document → mask → robot mark, plus the mask alone as the app icon. Ink `#171a21`, accent `#7c3aed` (light) and `#a78bfa` (dark), paper `#f6f5f1`. Sources in `brand/`; extension icons in `extension/icons/` are rendered from `brand/icon.svg` with headless Chrome screenshots at 16, 32, 48 and 128 px. The brief that produced it is `brand/logo-brief.md` in the site repo.
 
+Pasted images: the desktop app writes them to `<scratchpad_dir>/images/N.png` before submit and hooks receive `scratchpad_dir`; `pastedImages()` OCRs files newer than 10 minutes not yet listed in `$CLAUDE_PLUGIN_DATA/<session>.images`, blocks the prompt and writes `N-redacted.png` beside the original. The image block itself cannot be rewritten by a hook.
+
 ## Known false positives fixed
 
 - `"name": "Bash"` was masked as a person name and the model then called a tool named by the placeholder. Generic name labels now need two or more capitalised words (`fullNameLike`); first/last-name labels still take one.

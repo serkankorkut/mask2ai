@@ -68,9 +68,7 @@ const redirectPdf = (id, input, found) => {
   };
 };
 
-const redirectImage = (id, input, found) => {
-  const file = input.tool_input.file_path;
-  if (!visionBinary()) return { systemMessage: `mask2ai: ${path.basename(file)} read uninspected, redacting images needs macOS with the Swift toolchain` };
+const imageBoxes = (file, found) => {
   const boxes = [];
   for (const line of JSON.parse(vision('ocr', file))) {
     const hits = {};
@@ -86,6 +84,13 @@ const redirectImage = (id, input, found) => {
     }
     Object.assign(found, hits);
   }
+  return boxes;
+};
+
+const redirectImage = (id, input, found) => {
+  const file = input.tool_input.file_path;
+  if (!visionBinary()) return { systemMessage: `mask2ai: ${path.basename(file)} read uninspected, redacting images needs macOS with the Swift toolchain` };
+  const boxes = imageBoxes(file, found);
   if (!boxes.length) return null;
   const out = path.join(readsDir(id), `${stem(file)}${/\.jpe?g$/i.test(file) ? '.jpg' : '.png'}`);
   fs.mkdirSync(readsDir(id), { recursive: true });
@@ -112,6 +117,28 @@ const loadConfig = cwd => {
   return null;
 };
 
+const pastedImages = (id, input, found) => {
+  const imgDir = input.scratchpad_dir && path.join(input.scratchpad_dir, 'images');
+  if (!imgDir || !fs.existsSync(imgDir) || !visionBinary()) return [];
+  const seenFile = path.join(dir, `${id}.images`);
+  const seen = new Set(fs.existsSync(seenFile) ? fs.readFileSync(seenFile, 'utf8').split('\n') : []);
+  const blocked = [];
+  for (const name of fs.readdirSync(imgDir)) {
+    const file = path.join(imgDir, name);
+    if (!IMAGE.test(name) || /-redacted\./.test(name) || seen.has(file) || Date.now() - fs.statSync(file).mtimeMs > 10 * 60 * 1000) continue;
+    fs.mkdirSync(dir, { recursive: true });
+    fs.appendFileSync(seenFile, file + '\n', { mode: 0o600 });
+    const hits = {};
+    const boxes = imageBoxes(file, hits);
+    if (!boxes.length) continue;
+    const out = path.join(imgDir, name.replace(/\.(\w+)$/, '-redacted.png'));
+    vision('redact', file, out, JSON.stringify(boxes));
+    Object.assign(found, hits);
+    blocked.push({ name, out, count: Object.keys(hits).length });
+  }
+  return blocked;
+};
+
 const main = () => {
   const input = JSON.parse(fs.readFileSync(0, 'utf8'));
   const cfg = loadConfig(input.cwd);
@@ -124,8 +151,18 @@ const main = () => {
     case 'UserPromptSubmit': {
       const found = {};
       const masked = mask(input.prompt, found);
-      if (masked === input.prompt) break;
+      const images = pastedImages(id, input, found);
+      if (masked === input.prompt && !images.length) break;
       save(id, found);
+      if (images.length) {
+        const list = images.map(i => `${i.name}: ${i.count} value${i.count === 1 ? '' : 's'} found, redacted copy at ${i.out}`).join('\n');
+        out({
+          decision: 'block',
+          suppressOriginalPrompt: true,
+          reason: `mask2ai: personal data found in a pasted image, nothing was sent.\n${list}\n\nAttach the redacted copy instead (drag it into the chat) and resend${masked === input.prompt ? '.' : ' with this masked text:\n\n' + masked}`
+        });
+        break;
+      }
       const copied = process.platform === 'darwin' && spawnSync('pbcopy', { input: masked }).status === 0;
       out({
         decision: 'block',

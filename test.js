@@ -180,5 +180,18 @@ const afterEnd = run({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_in
 assert.strictEqual(afterEnd.hookSpecificOutput.updatedInput.command, 'echo veli@example.com');
 assert.strictEqual(afterEnd.hookSpecificOutput.permissionDecision, undefined);
 assert.strictEqual(run({ hook_event_name: 'PreToolUse', tool_name: 'Bash', permission_mode: 'bypassPermissions', tool_input: { command: `echo ${ph}` } }).hookSpecificOutput.permissionDecision, 'allow');
+if (process.platform === "darwin" && require("child_process").spawnSync("which", ["swiftc"]).status === 0) {
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "mask2ai-scratch-"));
+  fs.mkdirSync(path.join(scratch, "images"));
+  fs.copyFileSync(path.join(__dirname, "demo", "customer.png"), path.join(scratch, "images", "1.png"));
+  const runImg = input => { const r = spawnSync(process.execPath, [path.join(__dirname, "hooks/mask.js")], { input: JSON.stringify({ session_id: "s2", scratchpad_dir: scratch, ...input }), env: { ...process.env, CLAUDE_PLUGIN_DATA: process.env.CLAUDE_PLUGIN_DATA || data, PATH: process.env.PATH }, encoding: "utf8", timeout: 120000 }); assert.strictEqual(r.status, 0, r.stderr); return r.stdout ? JSON.parse(r.stdout) : null; };
+  const img = runImg({ hook_event_name: "UserPromptSubmit", prompt: "what is in this image" });
+  assert.strictEqual(img.decision, "block");
+  assert(img.reason.includes("1.png: 4 values") && img.reason.includes("1-redacted.png"), img.reason);
+  assert(fs.existsSync(path.join(scratch, "images", "1-redacted.png")));
+  assert.strictEqual(runImg({ hook_event_name: "UserPromptSubmit", prompt: "what is in this image" }), null);
+  fs.rmSync(scratch, { recursive: true });
+  console.log("pasted image ok");
+}
 fs.rmSync(data, { recursive: true });
 console.log('ok');
