@@ -3,7 +3,6 @@
 # mask2ai
 
 [![Release](https://img.shields.io/github/v/release/serkankorkut/mask2ai?style=flat-square&color=7c3aed)](https://github.com/serkankorkut/mask2ai/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/serkankorkut/mask2ai/total?style=flat-square&color=7c3aed)](https://github.com/serkankorkut/mask2ai/releases)
 [![Tests](https://img.shields.io/github/actions/workflow/status/serkankorkut/mask2ai/test.yml?style=flat-square&label=tests)](https://github.com/serkankorkut/mask2ai/actions/workflows/test.yml)
 [![License](https://img.shields.io/github/license/serkankorkut/mask2ai?style=flat-square)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/serkankorkut/mask2ai?style=flat-square)](https://github.com/serkankorkut/mask2ai/stargazers)
