@@ -18,4 +18,3 @@ Read `HANDOFF.md` first; it has the architecture, the verification commands and 
 - Demo data is the Doe family from `demo/customers.csv`, with repetitive numbers.
 - Keep `manifest.json`, `.claude-plugin/plugin.json` and `package.json` at the same version; the site reads it.
 - After the extension is on the Chrome Web Store, write its item ID to `store/id.txt`; the site reads it for the store badges.
-- Commit with the personal address: `git config --local user.email korkutserkan@outlook.com` in both repos. Never the mobileaction.co address.
