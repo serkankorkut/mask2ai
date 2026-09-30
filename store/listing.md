@@ -16,7 +16,7 @@ Before a message leaves claude.ai or chatgpt.com, the extension finds email addr
 
 - Runs entirely in the page. No server, no account, no telemetry.
 - A toast tells you how many values were masked each time you send.
-- Card numbers are Luhn-checked, IBANs mod-97-checked and Turkish TC numbers checksum-checked, so timestamps and version numbers are left alone.
+- Card numbers are Luhn-checked, IBANs mod-97-checked and Turkish ID numbers checksum-checked, so timestamps and version numbers are left alone.
 - English and Turkish formats.
 - The placeholder map lives in the tab and disappears when you close it.
 - Open source, MIT: https://github.com/serkankorkut/mask2ai

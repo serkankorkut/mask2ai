@@ -52,7 +52,7 @@ A real chat on chatgpt.com in Chrome with the extension loaded. The purple capti
 | Phone number | international `+..`, US, UK and Turkish formats | |
 | Payment card | 13 to 16 digit shapes, spaced or plain | Luhn |
 | IBAN | country code plus grouped alphanumerics | mod 97 |
-| Turkish TC kimlik no | 11 digits | official checksum |
+| Turkish ID number (TC Kimlik No) | 11 digits | official checksum |
 | US Social Security number | `ddd-dd-dddd` | |
 | Date of birth | after a label such as `DOB`, `date of birth`, `doğum tarihi` | |
 | Passport or ID number | after a label such as `passport no`, `kimlik no`, `ehliyet` | |
@@ -186,7 +186,7 @@ If you prefer your own instrument, point `ANTHROPIC_BASE_URL` at a logging proxy
 - `SessionStart` returns a status line for the user and one line of context telling the model that `__PII_*__` tokens are opaque literals to copy verbatim.
 - `SessionEnd` deletes the session's placeholder map.
 
-**Detection is an ordered pattern list** in `core/pii.js`. Each entry is a type, a regular expression and an optional validator. Emails run first so their digits are not later read as phones; cards, IBANs and TC numbers run before phones for the same reason. Label, title and cue patterns capture only the value, and a shape check rejects values such as `name: mask2ai` or `address: 0x7fff`. After the static pass, the local part of every masked email is split into tokens, and each token is masked where it appears capitalised or in capitals, accent-insensitively, which is how `jane.doe@` also hides `Jane` and `DOE` in a CSV column.
+**Detection is an ordered pattern list** in `core/pii.js`. Each entry is a type, a regular expression and an optional validator. Emails run first so their digits are not later read as phones; cards, IBANs and Turkish ID numbers run before phones for the same reason. Label, title and cue patterns capture only the value, and a shape check rejects values such as `name: mask2ai` or `address: 0x7fff`. After the static pass, the local part of every masked email is split into tokens, and each token is masked where it appears capitalised or in capitals, accent-insensitively, which is how `jane.doe@` also hides `Jane` and `DOE` in a CSV column.
 
 **Placeholders are content-addressed.** A value becomes `__PII_<TYPE>_<6 hex digits of a hash of the value>__`. The same value yields the same placeholder in a prompt, a file read and a grep result without a lookup, hooks running in parallel cannot disagree, and after a resume a single re-read rebuilds the map. Underscores keep the token a single word for the model and harmless inside code.
 
