@@ -1,5 +1,7 @@
 # Chrome Web Store listing
 
+Published 2026-10-04: https://chromewebstore.google.com/detail/lohmecihoickmpmnkocgdchahlhjiejb (item ID in `store/id.txt`). To ship a new version, upload the zip from `scripts/pack-extension.sh` in the developer console; the store build lags the repo until then.
+
 ## Name
 
 mask2ai

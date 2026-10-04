@@ -55,7 +55,7 @@ See `AGENTS.md` for the release words `DEPLOY ET` and `SYNC ET`.
 
 ## Chrome Web Store
 
-Not yet submitted. `scripts/pack-extension.sh` builds `dist/mask2ai-extension-<version>.zip` with only the extension files; `store/listing.md` has the listing text, permissions justification, privacy answers and steps. The owner must create the developer account, upload the zip and a 1280×800 screenshot showing the toast, and submit. The privacy policy URL is https://mask2ai.com/privacy/.
+Published 2026-10-04 at https://chromewebstore.google.com/detail/lohmecihoickmpmnkocgdchahlhjiejb, item ID in `store/id.txt`, which the site build reads for the store badge. The store copy is updated by uploading the zip in the developer console (owner only), so it can lag the repo version. `scripts/pack-extension.sh` builds `dist/mask2ai-extension-<version>.zip` with only the extension files; `store/listing.md` has the listing text, permissions justification, privacy answers and steps. The owner must create the developer account, upload the zip and a 1280×800 screenshot showing the toast, and submit. The privacy policy URL is https://mask2ai.com/privacy/.
 
 ## Brand
 

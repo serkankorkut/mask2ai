@@ -16,7 +16,7 @@ Two integrations share one detection core:
 | Environment | Integration | Verified by |
 | --- | --- | --- |
 | Claude Code CLI | plugin, six hooks, PDF to text, image redaction on macOS | `node test.js`, `node demo/prove.js` |
-| claude.ai in Chrome | extension, chat text and Office or text uploads | `node demo/verify-web.js` |
+| claude.ai in Chrome | extension on the [Chrome Web Store](https://chromewebstore.google.com/detail/lohmecihoickmpmnkocgdchahlhjiejb), chat text and Office or text uploads | `node demo/verify-web.js` |
 | ChatGPT web (chatgpt.com) in Chrome | extension, chat text | `node demo/verify-web.js` |
 
 ## Demos
@@ -119,9 +119,9 @@ claude --plugin-dir /path/to/mask2ai
 
 ### claude.ai and ChatGPT in Chrome
 
-1. Clone this repository, or download `mask2ai-extension-<version>.zip` from the [latest release](https://github.com/serkankorkut/mask2ai/releases/latest) and unzip it.
-2. Open `chrome://extensions`, enable Developer mode, choose Load unpacked and select the repository folder. The `manifest.json` at the root is the extension. Chrome 111 or newer is required.
-3. Open claude.ai or chatgpt.com. A "mask2ai: on" toast confirms the extension is active.
+Install from the Chrome Web Store: https://chromewebstore.google.com/detail/lohmecihoickmpmnkocgdchahlhjiejb. Then open claude.ai or chatgpt.com; a "mask2ai: on" toast confirms it is active. Chrome 111 or newer.
+
+To run the development version instead: clone this repository or unzip `mask2ai-extension-<version>.zip` from the [latest release](https://github.com/serkankorkut/mask2ai/releases/latest), open `chrome://extensions`, enable Developer mode, choose Load unpacked and select the folder.
 
 After changing the extension files, click the Reload icon on the mask2ai card in `chrome://extensions`. The version shown on the card comes from `manifest.json`; if it does not match the file, Chrome is still running the old build.
 
