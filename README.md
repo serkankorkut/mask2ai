@@ -254,7 +254,7 @@ node demo/chrome-open.js https://chatgpt.com/
 node demo/record-live.js chatgpt.com "<your message>" demo/chatgpt-web.gif
 ```
 
-The marketing site for mask2ai.com lives in its own repository, github.com/serkankorkut/mask2ai.com.
+The marketing site, mask2ai.com, lives in a separate private repository.
 
 ## Continuing the work
 
